@@ -35,7 +35,7 @@
    ngrok http -region=eu 3000
    ```
 3. <details>
-    <summary>Скопируйте урл из вывода ngrok и вставьте в качестве переменной окружения для функции:</summary>
+    <summary>Скопируйте урл из вывода ngrok и вставьте в качестве переменной окружения <code>TARGET_URL</code>для функции:</summary>
      
     ![image](https://user-images.githubusercontent.com/1473072/66268339-125d4280-e845-11e9-901c-488a41305ba7.png)
   
