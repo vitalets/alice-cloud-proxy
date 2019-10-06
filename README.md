@@ -15,8 +15,9 @@
 2. Скопируйте полностью код файла [src/index.js](https://github.com/vitalets/alice-cloud-proxy/blob/master/src/index.js) из этого репозитория и вставьте в `index.js` для функции
 3. Сохраните изменения в функции, нажав на кнопку "Создать версию"
 4. [Заведите](https://yandex.ru/dev/dialogs/alice/doc/publish-docpage/#publish) тестовый приватный навык, который будете использовать как прокси для тестирования других навыков
-5. В настройках прокси-навыка укажите вашу функцию:
+5. <details><summary>Click to expand!</summary>В настройках прокси-навыка укажите вашу функцию</summary>
    ![image](https://user-images.githubusercontent.com/1473072/66268276-79c6c280-e844-11e9-83c5-15fe37c32583.png)
+   </details>
 6. Сохраните изменения, перейдите на вкладку тестирование и проверьте, что проксирующий навык работает (должен отвечать `Please set TARGET_URL in environment`)
    ![image](https://user-images.githubusercontent.com/1473072/66268399-b47d2a80-e845-11e9-97d3-11be682d94f6.png)
 
