@@ -14,15 +14,17 @@
 1. Создайте облачную функцию согласно [инструкции](https://yandex.ru/dev/dialogs/alice/doc/deploy-ycloud-function-docpage/) для Node.js
 2. Скопируйте полностью код файла [src/index.js](https://github.com/vitalets/alice-cloud-proxy/blob/master/src/index.js) из этого репозитория и вставьте в `index.js` для функции
 3. Сохраните изменения в функции, нажав на кнопку "Создать версию"
-4. [Заведите](https://yandex.ru/dev/dialogs/alice/doc/publish-docpage/#publish) тестовый приватный навык, который будете использовать как прокси для тестирования других навыков
+4. [В панели разработчика](https://yandex.ru/dev/dialogs/alice/doc/publish-docpage/#publish) заведите тестовый приватный навык, который будете использовать как прокси для других навыков
 5. <details>
-     <summary>В настройках прокси-навыка укажите вашу функцию</summary>
+     <summary>В настройках прокси-навыка укажите вашу функцию:</summary>
    
      ![image](https://user-images.githubusercontent.com/1473072/66268276-79c6c280-e844-11e9-83c5-15fe37c32583.png)
    </details>
    
-6. Сохраните изменения, перейдите на вкладку тестирование и проверьте, что проксирующий навык работает (должен отвечать `Please set TARGET_URL in environment`)
+6. <details>
+     <summary>Сохраните изменения, перейдите на вкладку тестирование и проверьте, что проксирующий навык работает (должен отвечать `Please set TARGET_URL in environment`)</summary>
    ![image](https://user-images.githubusercontent.com/1473072/66268399-b47d2a80-e845-11e9-97d3-11be682d94f6.png)
+  </details>
 
 ## Использование
 
@@ -31,10 +33,17 @@
    ```bash
    ngrok http -region=eu 3000
    ```
-3. Скопируйте урл из вывода ngrok:
-  ![image](https://user-images.githubusercontent.com/1473072/66268339-125d4280-e845-11e9-901c-488a41305ba7.png)
-  и вставьте в качестве переменной окружения для функции:
-  ![image](https://user-images.githubusercontent.com/1473072/66268348-328d0180-e845-11e9-9578-adaf2812dca1.png)
+3. <details>
+    <summary>Скопируйте урл из вывода ngrok:</summary>
+     
+    ![image](https://user-images.githubusercontent.com/1473072/66268339-125d4280-e845-11e9-901c-488a41305ba7.png)
+  </details>
+  
+  <details>
+    <summary>и вставьте в качестве переменной окружения для функции:</summary>
+  
+   ![image](https://user-images.githubusercontent.com/1473072/66268348-328d0180-e845-11e9-9578-adaf2812dca1.png)
+ </details>  
 4. Сохраните изменения в функции 
 5. Запустите проксирующий навык в приложении с Алисой и тестируйте локальную версию
 
