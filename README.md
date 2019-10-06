@@ -18,7 +18,8 @@
 5. <details>
      <summary>В настройках прокси-навыка укажите вашу функцию:</summary>
    
-     ![image](https://user-images.githubusercontent.com/1473072/66268276-79c6c280-e844-11e9-83c5-15fe37c32583.png | width=100)
+     ![image](https://user-images.githubusercontent.com/1473072/66268276-79c6c280-e844-11e9-83c5-15fe37c32583.png)
+     <img src="https://user-images.githubusercontent.com/1473072/66268276-79c6c280-e844-11e9-83c5-15fe37c32583.png" width="300">
    </details>
    
 6. <details>
