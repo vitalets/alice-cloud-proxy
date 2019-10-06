@@ -5,7 +5,7 @@
 
   "globals": {
     "assert": false,
-    "sinon": false
+    "nock": false
   },
 
   "plugins": [

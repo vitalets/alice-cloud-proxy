@@ -6,6 +6,6 @@ chai.config.truncateThreshold = 0;
 global.assert = chai.assert;
 global.nock = nock;
 
-after(() => {
+afterEach(() => {
   nock.cleanAll();
 });

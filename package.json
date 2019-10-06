@@ -13,7 +13,8 @@
   "scripts": {
     "code": "eslint src test",
     "test": "mocha test/setup.js test/*.spec.js",
-    "test:cov": "nyc --reporter=html --check-coverage --lines 100 npm t && nyc report",
+    "test:cov": "nyc --reporter=html --check-coverage --lines 95 npm t && nyc report",
+    "open:cov": "open coverage/index.html",
     "toc": "markdown-toc README.md -i"
   },
   "main": "src/index.js",

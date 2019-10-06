@@ -1,8 +1,13 @@
 const http = require('http');
 const https = require('https');
 
-const TARGET_URL = process.env.TARGET_URL;
-const TIMEOUT = process.env.TIMEOUT || 2500;
+/**
+ * Options
+ */
+const options = exports.options = {
+  targetUrl: process.env.TARGET_URL,
+  timeout: process.env.TIMEOUT || 2500,
+};
 
 /**
  * Entry point.
@@ -28,12 +33,13 @@ async function handleRequest(event) {
     if (isPing(event)) {
       return buildPingResponse(event);
     }
-    if (!TARGET_URL) {
+    const {targetUrl, timeout} = options;
+    if (!targetUrl) {
       return buildErrorResponse(event, new Error('Please set TARGET_URL in environment'));
     }
     return await Promise.race([
-      proxyRequest(event, TARGET_URL),
-      timeout(TIMEOUT, 'Proxy timeout'),
+      proxyRequest(event, targetUrl, {timeout}),
+      waitTimeout(timeout, 'Target timeout'),
     ]);
   } catch (error) {
     return buildErrorResponse(event, error);
@@ -45,12 +51,13 @@ async function handleRequest(event) {
  *
  * @param {Object} event
  * @param {String} targetUrl
+ * @param {Number} timeout
  * @returns {Promise}
  */
-async function proxyRequest(event, targetUrl) {
+async function proxyRequest(event, targetUrl, {timeout} = {}) {
   console.log(`PROXY TO: ${targetUrl}`);
   const requestBody = JSON.stringify(event);
-  const options = {method: 'POST', timeout: TIMEOUT};
+  const options = {method: 'POST', timeout};
   const responseBody = await request(targetUrl, options, requestBody);
   return JSON.parse(responseBody);
 }
@@ -108,7 +115,7 @@ async function request(url, options, body) {
  * @param {String} message
  * @returns {Promise}
  */
-async function timeout(ms, message) {
+async function waitTimeout(ms, message) {
   return new Promise(resolve => setTimeout(resolve, ms))
     .then(() => Promise.reject(new Error(message)));
 }
