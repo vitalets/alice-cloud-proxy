@@ -18,11 +18,11 @@
 5. <details>
      <summary>В настройках прокси-навыка укажите вашу функцию:</summary>
    
-     ![image](https://user-images.githubusercontent.com/1473072/66268276-79c6c280-e844-11e9-83c5-15fe37c32583.png)
+     ![image](https://user-images.githubusercontent.com/1473072/66268276-79c6c280-e844-11e9-83c5-15fe37c32583.png | width=100)
    </details>
    
 6. <details>
-     <summary>Сохраните изменения, перейдите на вкладку тестирование и проверьте, что проксирующий навык работает (должен отвечать `Please set TARGET_URL in environment`)</summary>
+     <summary>Сохраните изменения, перейдите на вкладку тестирование и проверьте, что проксирующий навык работает (должен отвечать <code>Please set TARGET_URL in environment</code>)</summary>
      
      ![image](https://user-images.githubusercontent.com/1473072/66268399-b47d2a80-e845-11e9-97d3-11be682d94f6.png)
   </details>
@@ -35,13 +35,9 @@
    ngrok http -region=eu 3000
    ```
 3. <details>
-    <summary>Скопируйте урл из вывода ngrok:</summary>
+    <summary>Скопируйте урл из вывода ngrok и вставьте в качестве переменной окружения для функции:</summary>
      
-     ![image](https://user-images.githubusercontent.com/1473072/66268339-125d4280-e845-11e9-901c-488a41305ba7.png)
-  </details>
-  
-  <details>
-     <summary>и вставьте в качестве переменной окружения для функции:</summary>
+    ![image](https://user-images.githubusercontent.com/1473072/66268339-125d4280-e845-11e9-901c-488a41305ba7.png)
   
     ![image](https://user-images.githubusercontent.com/1473072/66268591-839df500-e847-11e9-9826-c3aa8543f0ad.png)
   </details>
