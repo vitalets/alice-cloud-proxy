@@ -13,7 +13,8 @@
   "scripts": {
     "code": "eslint src test",
     "test": "mocha test/setup.js test/*.spec.js",
-    "test:cov": "nyc --reporter=html --check-coverage --lines 100 npm t && nyc report"
+    "test:cov": "nyc --reporter=html --check-coverage --lines 100 npm t && nyc report",
+    "toc": "markdown-toc README.md -i"
   },
   "main": "src/index.js",
   "engines": {
@@ -35,6 +36,7 @@
     "eslint-plugin-mocha": "^6.0.0",
     "husky": "^3.0.8",
     "lint-staged": "^9.2.3",
+    "markdown-toc": "^1.2.0",
     "mocha": "^6.2.0",
     "nock": "^11.3.6",
     "nyc": "^14.1.1"
