@@ -17,15 +17,12 @@
 4. [В панели разработчика](https://yandex.ru/dev/dialogs/alice/doc/publish-docpage/#publish) заведите тестовый приватный навык, который будете использовать как прокси для других навыков
 5. <details>
      <summary>В настройках прокси-навыка укажите вашу функцию:</summary>
-   
-     ![image](https://user-images.githubusercontent.com/1473072/66268276-79c6c280-e844-11e9-83c5-15fe37c32583.png)
-     <img src="https://user-images.githubusercontent.com/1473072/66268276-79c6c280-e844-11e9-83c5-15fe37c32583.png" width="300">
+     <img src="https://user-images.githubusercontent.com/1473072/66268276-79c6c280-e844-11e9-83c5-15fe37c32583.png" width="600">
    </details>
    
 6. <details>
      <summary>Сохраните изменения, перейдите на вкладку тестирование и проверьте, что проксирующий навык работает (должен отвечать <code>Please set TARGET_URL in environment</code>)</summary>
-     
-     ![image](https://user-images.githubusercontent.com/1473072/66268399-b47d2a80-e845-11e9-97d3-11be682d94f6.png)
+     <img src="https://user-images.githubusercontent.com/1473072/66268399-b47d2a80-e845-11e9-97d3-11be682d94f6.png" width="600">
   </details>
 
 ## Использование
@@ -37,11 +34,9 @@
    ```
 3. <details>
     <summary>Скопируйте урл из вывода ngrok и вставьте в качестве переменной окружения <code>TARGET_URL</code>для функции:</summary>
-     
-    ![image](https://user-images.githubusercontent.com/1473072/66268339-125d4280-e845-11e9-901c-488a41305ba7.png)
-  
+    <img src="https://user-images.githubusercontent.com/1473072/66268339-125d4280-e845-11e9-901c-488a41305ba7.png" width="600">
     В окне управления функцией:
-    ![image](https://user-images.githubusercontent.com/1473072/66268591-839df500-e847-11e9-9826-c3aa8543f0ad.png)
+     <img src="https://user-images.githubusercontent.com/1473072/66268591-839df500-e847-11e9-9826-c3aa8543f0ad.png" width="600">
   </details>
  
 4. Сохраните изменения в функции 
