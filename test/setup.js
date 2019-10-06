@@ -1,11 +1,11 @@
 const chai = require('chai');
-const sinon = require('sinon');
+const nock = require('nock');
 
 chai.config.truncateThreshold = 0;
 
 global.assert = chai.assert;
-global.sinon = sinon;
+global.nock = nock;
 
-afterEach(async () => {
-  sinon.restore();
+after(() => {
+  nock.cleanAll();
 });
