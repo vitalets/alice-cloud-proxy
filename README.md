@@ -17,8 +17,9 @@
 4. [В панели разработчика](https://yandex.ru/dev/dialogs/alice/doc/publish-docpage/#publish) заведите тестовый приватный навык, который будете использовать как прокси для других навыков
 5. В настройках прокси-навыка укажите вашу функцию:
    <img src="https://user-images.githubusercontent.com/1473072/66268276-79c6c280-e844-11e9-83c5-15fe37c32583.png" width="600"> 
-6. Сохраните изменения, перейдите на вкладку тестирование и проверьте, что проксирующий навык работает (должен отвечать `Please set TARGET_URL in environment`):
+6. Сохраните изменения, перейдите на вкладку тестирование и проверьте, что проксирующий навык работает (должен отвечать *Please set TARGET_URL in environment*):
    <img src="https://user-images.githubusercontent.com/1473072/66268399-b47d2a80-e845-11e9-97d3-11be682d94f6.png" width="600">
+7. Настройка завершена
 
 ## Использование
 
@@ -27,13 +28,10 @@
    ```bash
    ngrok http -region=eu 3000
    ```
-3. <details>
-    <summary>Скопируйте урл из вывода ngrok и вставьте в качестве переменной окружения <code>TARGET_URL</code>для функции:</summary>
-    <img src="https://user-images.githubusercontent.com/1473072/66268339-125d4280-e845-11e9-901c-488a41305ba7.png" width="600">
-    В окне управления функцией:
-     <img src="https://user-images.githubusercontent.com/1473072/66268591-839df500-e847-11e9-9826-c3aa8543f0ad.png" width="600">
-  </details>
- 
+3. Скопируйте урл из вывода ngrok:
+   <img src="https://user-images.githubusercontent.com/1473072/66268339-125d4280-e845-11e9-901c-488a41305ba7.png" width="600"><br>
+   и вставьте в качестве переменной окружения `TARGET_URL` для функции:
+   <img src="https://user-images.githubusercontent.com/1473072/66268591-839df500-e847-11e9-9826-c3aa8543f0ad.png" width="600">
 4. Сохраните изменения в функции 
 5. Запустите проксирующий навык в приложении с Алисой и проверяйте свой навык
 
