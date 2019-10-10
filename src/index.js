@@ -7,6 +7,7 @@ const https = require('https');
 const options = exports.options = {
   targetUrl: process.env.TARGET_URL,
   timeout: process.env.TIMEOUT || 2500,
+  allowedUsers: tryRequire('./allowed-users') || [],
 };
 
 /**
@@ -32,6 +33,9 @@ async function handleRequest(event) {
   try {
     if (isPing(event)) {
       return buildPingResponse(event);
+    }
+    if (!isAllowedUser(event)) {
+      return buildNotAllowedResponse(event);
     }
     const {targetUrl, timeout} = options;
     if (!targetUrl) {
@@ -126,7 +130,7 @@ async function waitTimeout(ms, message) {
  * @param {Object} event
  * @returns {Promise}
  */
-async function buildPingResponse({version, session}) {
+function buildPingResponse({version, session}) {
   return {
     version,
     session,
@@ -155,4 +159,45 @@ function buildErrorResponse({version, session}, error) {
       end_session: false,
     },
   };
+}
+
+/**
+ * Builds alice response for not allowed user
+ *
+ * @param {Object} event
+ * @returns {Promise}
+ */
+function buildNotAllowedResponse({version, session}) {
+  return {
+    version,
+    session,
+    response: {
+      text: 'Это приватный навык. Для выхода скажите "Хватит".',
+      end_session: false,
+    },
+  };
+}
+
+/**
+ * Try to require file.
+ *
+ * @returns {?Array}
+ */
+function tryRequire(file) {
+  try {
+    return require(file);
+  } catch (e) {
+    return null;
+  }
+}
+
+/**
+ * Is allowed user.
+ *
+ * @param {Object} session
+ * @returns {Boolean}
+ */
+function isAllowedUser({session}) {
+  const {allowedUsers} = options;
+  return !allowedUsers || !allowedUsers.length || allowedUsers.includes(session.user_id);
 }
