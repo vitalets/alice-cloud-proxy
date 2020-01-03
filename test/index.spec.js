@@ -47,7 +47,7 @@ describe('handler', () => {
 
     assert.deepEqual(response, {
       response: {
-        text: 'Target timeout',
+        text: 'Target timeout: 250 ms',
         tts: 'ошибка',
         end_session: false
       },

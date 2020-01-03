@@ -43,7 +43,7 @@ async function handleRequest(event) {
     }
     return await Promise.race([
       proxyRequest(event, targetUrl, {timeout}),
-      waitTimeout(timeout, 'Target timeout'),
+      waitTimeout(timeout, `Target timeout: ${timeout} ms`),
     ]);
   } catch (error) {
     return buildErrorResponse(event, error);
