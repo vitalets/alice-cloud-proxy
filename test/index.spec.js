@@ -59,7 +59,7 @@ describe('handler', () => {
   it('target http error', async () => {
     const scope = nock('http://localhost')
       .post('/')
-      // nock can't st statusMessage
+      // nock can't set statusMessage
       // see: https://github.com/nock/nock/issues/469
       .reply(500);
 
@@ -147,6 +147,29 @@ describe('handler', () => {
       response: {
         text: 'Please set TARGET_URL in environment',
         tts: 'ошибка',
+        end_session: false
+      },
+      session: 1,
+      version: 2,
+    });
+  });
+
+  it('custom error text', async () => {
+    options.targetUrl = '';
+    options.errorText = 'Повторите пожалуйста';
+
+    const response = await handler({
+      request: {
+        command: 'foo'
+      },
+      session: 1,
+      version: 2,
+    });
+
+    assert.deepEqual(response, {
+      response: {
+        text: 'Повторите пожалуйста',
+        tts: 'Повторите пожалуйста',
         end_session: false
       },
       session: 1,

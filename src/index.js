@@ -7,6 +7,7 @@ const https = require('https');
 const options = exports.options = {
   targetUrl: process.env.TARGET_URL,
   timeout: process.env.TIMEOUT || 2500,
+  errorText: process.env.ERROR_TEXT,
   allowedUsers: tryRequire('./allowed-users') || [],
 };
 
@@ -150,14 +151,16 @@ function buildPingResponse({version, session}) {
  */
 function buildErrorResponse({version, session}, error) {
   console.log('ERROR:', error);
+  const text = options.errorText || (error && error.message) || String(error);
+  const tts = options.errorText || 'ошибка';
   return {
-    version,
-    session,
     response: {
-      text: error && error.message || String(error),
-      tts: 'ошибка',
+      text,
+      tts,
       end_session: false,
     },
+    session,
+    version,
   };
 }
 
