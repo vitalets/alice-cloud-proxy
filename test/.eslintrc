@@ -5,7 +5,9 @@
 
   "globals": {
     "assert": false,
-    "nock": false
+    "nock": false,
+    "handler": false,
+    "options": false
   },
 
   "plugins": [

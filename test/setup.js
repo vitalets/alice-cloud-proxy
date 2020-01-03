@@ -1,10 +1,21 @@
 const chai = require('chai');
 const nock = require('nock');
+const {handler, options} = require('../');
 
 chai.config.truncateThreshold = 0;
 
-global.assert = chai.assert;
-global.nock = nock;
+Object.assign(global, {
+  assert: chai.assert,
+  nock,
+  handler,
+  options,
+});
+
+beforeEach(() => {
+  options.targetUrl = 'http://localhost';
+  options.timeout = 250;
+  options.allowedUsers = [];
+});
 
 afterEach(() => {
   nock.cleanAll();

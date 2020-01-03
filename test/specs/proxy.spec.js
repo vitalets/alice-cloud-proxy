@@ -1,14 +1,6 @@
-const {handler, options} = require('../src/index');
+describe('proxy', () => {
 
-describe('handler', () => {
-
-  beforeEach(() => {
-    options.targetUrl = 'http://localhost';
-    options.timeout = 250;
-    options.allowedUsers = [];
-  });
-
-  it('proxy ok', async () => {
+  it('success', async () => {
     const scope = nock('http://localhost')
       .post('/')
       .reply(200, {
@@ -31,7 +23,7 @@ describe('handler', () => {
     });
   });
 
-  it('proxy timeout', async () => {
+  it('timeout', async () => {
     nock('http://localhost')
       .post('/')
       .delay(300)
@@ -56,7 +48,7 @@ describe('handler', () => {
     });
   });
 
-  it('target http error', async () => {
+  it('http error', async () => {
     const scope = nock('http://localhost')
       .post('/')
       // nock can't set statusMessage
@@ -83,7 +75,7 @@ describe('handler', () => {
     });
   });
 
-  it('target network error', async () => {
+  it('network error', async () => {
     const scope = nock('http://localhost')
       .post('/')
       .replyWithError('err message');
@@ -101,30 +93,6 @@ describe('handler', () => {
       response: {
         text: 'err message',
         tts: 'ошибка',
-        end_session: false
-      },
-      session: 1,
-      version: 2,
-    });
-  });
-
-  it('ping', async () => {
-    const scope = nock('http://localhost')
-      .post('/')
-      .reply(200, { });
-
-    const response = await handler({
-      request: {
-        command: 'ping'
-      },
-      session: 1,
-      version: 2,
-    });
-
-    assert.equal(scope.isDone(), false);
-    assert.deepEqual(response, {
-      response: {
-        text: 'pong',
         end_session: false
       },
       session: 1,
@@ -173,75 +141,6 @@ describe('handler', () => {
         end_session: false
       },
       session: 1,
-      version: 2,
-    });
-  });
-
-  it('allowed user', async () => {
-    const scope = nock('http://localhost')
-      .post('/')
-      .reply(200, {
-        response: {
-          text: 'world',
-          end_session: false
-        },
-        session: {
-          user_id: 'foo'
-        },
-        version: 2,
-      });
-
-    options.allowedUsers = ['foo'];
-
-    const response = await handler({
-      request: {
-        command: 'hello'
-      },
-      session: {
-        user_id: 'foo'
-      },
-      version: 2,
-    });
-
-    assert.equal(scope.isDone(), true);
-    assert.deepEqual(response, {
-      response: {
-        text: 'world',
-        end_session: false
-      },
-      session: {
-        user_id: 'foo'
-      },
-      version: 2,
-    });
-  });
-
-  it('not allowed user', async () => {
-    const scope = nock('http://localhost')
-      .post('/')
-      .reply(200, { });
-
-    options.allowedUsers = ['foo'];
-
-    const response = await handler({
-      request: {
-        command: 'hello'
-      },
-      session: {
-        user_id: 'bar'
-      },
-      version: 2,
-    });
-
-    assert.equal(scope.isDone(), false);
-    assert.deepEqual(response, {
-      response: {
-        text: 'Это приватный навык. Для выхода скажите "Хватит".',
-        end_session: false
-      },
-      session: {
-        user_id: 'bar'
-      },
       version: 2,
     });
   });
