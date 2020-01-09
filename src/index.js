@@ -1,84 +1,83 @@
-const http = require('http');
-const https = require('https');
-
-/**
- * Options
- */
-const options = exports.options = {
-  targetUrl: process.env.TARGET_URL,
-  timeout: process.env.TIMEOUT || 2500,
-  errorText: process.env.ERROR_TEXT,
-  allowedUsers: tryRequire('./allowed-users') || [],
-};
+const getHttp = () => require('http');
+const getHttps = () => require('https');
+const config = require('./config');
 
 /**
  * Entry point.
  *
- * @param {Object} event
+ * @param {Object} reqBody
  * @returns {Promise}
  */
-exports.handler = async (event = {}) => {
-  console.log(`REQUEST: ${JSON.stringify(event)}`);
-  const responseBody = await handleRequest(event);
-  console.log(`RESPONSE: ${JSON.stringify(responseBody.response)}`);
-  return responseBody;
+exports.handler = async reqBody => {
+  const reqBodyStr = JSON.stringify(reqBody);
+  console.log(`REQUEST: ${reqBodyStr}`);
+  const resBody = await handleRequest({ reqBody, reqBodyStr });
+  console.log(`RESPONSE: ${JSON.stringify(resBody.response)}`);
+  return resBody;
 };
 
 /**
  * Handles request.
  *
- * @param {Object} event
+ * @param {Object} reqBody
+ * @param {String} reqBodyStr
  * @returns {Promise}
  */
-async function handleRequest(event) {
+async function handleRequest({ reqBody, reqBodyStr }) {
   try {
-    if (isPing(event)) {
-      return buildPingResponse(event);
+    if (isPing(reqBody)) {
+      return buildPingResponse(reqBody);
     }
-    if (!isAllowedUser(event)) {
-      return buildNotAllowedResponse(event);
+    if (!isAllowedUser(reqBody)) {
+      return buildNotAllowedResponse(reqBody);
     }
-    const {targetUrl, timeout} = options;
+    const { targetUrl, timeout } = config;
     if (!targetUrl) {
-      return buildErrorResponse(event, new Error('Please set TARGET_URL in environment'));
+      return buildErrorResponse(reqBody, new Error('Please set targetUrl in config.js'));
     }
     return await Promise.race([
-      proxyRequest(event, targetUrl, {timeout}),
-      waitTimeout(timeout, `Target timeout: ${timeout} ms`),
+      proxyRequest(reqBodyStr, targetUrl, { timeout }),
+      waitTimeout(timeout, `Target timeout: ${ timeout } ms`),
     ]);
   } catch (error) {
-    return buildErrorResponse(event, error);
+    return buildErrorResponse(reqBody, error);
+  }
+}
+
+/**
+ * Is incoming 'ping' request.
+ *
+ * @param {Object} reqBody
+ * @returns {Boolean}
+ */
+function isPing(reqBody) {
+  try {
+    return reqBody.request.command === 'ping';
+  } catch (e) {
+    return false;
   }
 }
 
 /**
  * Proxies request to target url.
  *
- * @param {Object} event
+ * @param {String} reqBodyStr
  * @param {String} targetUrl
  * @param {Number} timeout
- * @returns {Promise}
+ * @returns {Promise<Object>}
  */
-async function proxyRequest(event, targetUrl, {timeout} = {}) {
+async function proxyRequest(reqBodyStr, targetUrl, { timeout } = {}) {
   console.log(`PROXY TO: ${targetUrl}`);
-  const requestBody = JSON.stringify(event);
-  const options = {method: 'POST', timeout};
-  const responseBody = await request(targetUrl, options, requestBody);
-  return JSON.parse(responseBody);
-}
-
-/**
- * Is incoming 'ping' request.
- *
- * @param {Object} event
- * @returns {Boolean}
- */
-function isPing(event) {
-  try {
-    return event.request.command === 'ping';
-  } catch (e) {
-    return false;
-  }
+  const options = {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+    },
+    timeout,
+  };
+  const resBodyStr = await sendRequest(targetUrl, options, reqBodyStr);
+  return JSON.parse(resBodyStr);
 }
 
 /**
@@ -89,9 +88,9 @@ function isPing(event) {
  * @param {String} [body] request body
  * @returns {Promise<String>}
  */
-async function request(url, options, body) {
+async function sendRequest(url, options, body) {
   return new Promise((resolve, reject) => {
-    const httpModule = /^https/.test(url) ? https : http;
+    const httpModule = /^https/.test(url) ? getHttps() : getHttp();
     const req = httpModule.request(url, options || {}, res => {
       if (res.statusCode < 200 || res.statusCode >= 300) {
         const error = new Error(`${res.statusCode} ${res.statusMessage} ${url}`);
@@ -131,14 +130,14 @@ async function waitTimeout(ms, message) {
  * @param {Object} event
  * @returns {Promise}
  */
-function buildPingResponse({version, session}) {
+function buildPingResponse({ session, version }) {
   return {
-    version,
-    session,
     response: {
       text: 'pong',
       end_session: false,
     },
+    session,
+    version,
   };
 }
 
@@ -150,9 +149,9 @@ function buildPingResponse({version, session}) {
  * @returns {Object}
  */
 function buildErrorResponse({version, session}, error) {
-  console.log('ERROR:', error);
-  const text = options.errorText || (error && error.message) || String(error);
-  const tts = options.errorText || 'ошибка';
+  console.error('ERROR:', error);
+  const text = config.errorText || (error && error.message) || String(error);
+  const tts = config.errorText || 'Ошибка';
   return {
     response: {
       text,
@@ -170,7 +169,7 @@ function buildErrorResponse({version, session}, error) {
  * @param {Object} event
  * @returns {Promise}
  */
-function buildNotAllowedResponse({version, session}) {
+function buildNotAllowedResponse({ version, session }) {
   return {
     version,
     session,
@@ -182,25 +181,12 @@ function buildNotAllowedResponse({version, session}) {
 }
 
 /**
- * Try to require file.
- *
- * @returns {?Array}
- */
-function tryRequire(file) {
-  try {
-    return require(file);
-  } catch (e) {
-    return null;
-  }
-}
-
-/**
  * Is allowed user.
  *
- * @param {Object} session
+ * @param {Object} reqBody
  * @returns {Boolean}
  */
-function isAllowedUser({session}) {
-  const {allowedUsers} = options;
+function isAllowedUser({ session }) {
+  const { allowedUsers } = config;
   return !allowedUsers || !allowedUsers.length || allowedUsers.includes(session.user_id);
 }

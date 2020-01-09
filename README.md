@@ -7,7 +7,6 @@
 - [Подробнее](#%D0%BF%D0%BE%D0%B4%D1%80%D0%BE%D0%B1%D0%BD%D0%B5%D0%B5)
 - [Настройка](#%D0%BD%D0%B0%D1%81%D1%82%D1%80%D0%BE%D0%B9%D0%BA%D0%B0)
 - [Использование](#%D0%B8%D1%81%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5)
-- [Фильтрация по userId](#%D1%84%D0%B8%D0%BB%D1%8C%D1%82%D1%80%D0%B0%D1%86%D0%B8%D1%8F-%D0%BF%D0%BE-userid)
 - [Лицензия](#%D0%BB%D0%B8%D1%86%D0%B5%D0%BD%D0%B7%D0%B8%D1%8F)
 
 <!-- tocstop -->
@@ -20,14 +19,14 @@
 ## Настройка
 
 1. Создайте облачную функцию согласно [инструкции](https://yandex.ru/dev/dialogs/alice/doc/deploy-ycloud-function-docpage/) для Node.js
-2. Скопируйте полностью код файла [src/index.js](https://github.com/vitalets/alice-cloud-proxy/blob/master/src/index.js) из этого репозитория и вставьте в `index.js` для функции
-3. Сохраните изменения в функции, нажав на кнопку "Создать версию"
+2. Создайте в редакторе функции файл `index.js` и скопируйте туда код из [src/index.js](https://github.com/vitalets/alice-cloud-proxy/blob/master/src/index.js)
+3. Создайте в редакторе функции файл конфигурации `config.js` и скопируйте туда код из [src/config.js](https://github.com/vitalets/alice-cloud-proxy/blob/master/src/config.js)
+4. Сохраните изменения в функции, нажав на кнопку "Создать версию"
 4. [В панели разработчика](https://yandex.ru/dev/dialogs/alice/doc/publish-docpage/#publish) заведите тестовый приватный навык, который будете использовать как прокси для других навыков
 5. В настройках прокси-навыка укажите вашу функцию:
    <img src="https://user-images.githubusercontent.com/1473072/66268276-79c6c280-e844-11e9-83c5-15fe37c32583.png" width="600"> 
-6. Сохраните изменения, перейдите на вкладку тестирование и проверьте, что проксирующий навык работает (должен отвечать *Please set TARGET_URL in environment*):
+6. Сохраните изменения, перейдите на вкладку тестирование и проверьте, что проксирующий навык работает (должен отвечать *Please set targetUrl in config.js*):
    <img src="https://user-images.githubusercontent.com/1473072/66268399-b47d2a80-e845-11e9-97d3-11be682d94f6.png" width="600">
-7. Теперь все готово!
 
 ## Использование
 
@@ -37,25 +36,18 @@
    ngrok http -region=eu 3000
    ```
 3. Скопируйте урл из вывода ngrok:
+
    <img src="https://user-images.githubusercontent.com/1473072/66268339-125d4280-e845-11e9-901c-488a41305ba7.png" width="600"><br>
-   и вставьте в качестве переменной окружения `TARGET_URL` для функции:
-   <img src="https://user-images.githubusercontent.com/1473072/66268591-839df500-e847-11e9-9826-c3aa8543f0ad.png" width="600">
+   
+   и вставьте в `config.js`:
+   ```js
+   module.exports = {
+     targetUrl: 'http://5d7df68d.eu.ngrok.io',
+     // ...
+   };
+   ```
 4. Сохраните изменения в функции (кнопка "Создать версию")
-5. Запустите проксирующий навык в приложении с Алисой - запросы пойдут на выаш локальный навык
-
-## Фильтрация по userId
-Даже приватный навык могут запустить другие пользователи, если произнесут фразу активации (возможно случайно).
-Чтобы защитить ваш прокси навык от таких срабатываний можно добавить дополнительную фильтрацию по `user_id`.
-Для этого нужно в редакторе облачной функции создать файл `allowed-users.js`, в котором перечислить все разрешенные `user_id`:
-```js
-module.exports = [
-  '0340D30CBE71676F5094A465B321D1297EB66182AE1D736C60DD5B33A2AB55EE'
-];
-```
-Значение `user_id` для вашего устройства можно посмотреть в логах облачной функции:
-<img src="https://user-images.githubusercontent.com/1473072/66571608-4489df80-eb78-11e9-8936-995efbb511ff.png" width="600">
-
-Если файл `allowed-users.js` пустой - то доступ разрешен всем пользователям.
+5. Запустите проксирующий навык в приложении с Алисой - запросы пойдут на ваш локальный навык
 
 ## Лицензия
 MIT @ [Vitaliy Potapov](https://github.com/vitalets)

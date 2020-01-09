@@ -40,7 +40,7 @@ describe('proxy', () => {
     assert.deepEqual(response, {
       response: {
         text: 'Target timeout: 250 ms',
-        tts: 'ошибка',
+        tts: 'Ошибка',
         end_session: false
       },
       session: 1,
@@ -67,7 +67,7 @@ describe('proxy', () => {
     assert.deepEqual(response, {
       response: {
         text: '500 null http://localhost',
-        tts: 'ошибка',
+        tts: 'Ошибка',
         end_session: false
       },
       session: 1,
@@ -92,7 +92,7 @@ describe('proxy', () => {
     assert.deepEqual(response, {
       response: {
         text: 'err message',
-        tts: 'ошибка',
+        tts: 'Ошибка',
         end_session: false
       },
       session: 1,
@@ -101,7 +101,7 @@ describe('proxy', () => {
   });
 
   it('no target url', async () => {
-    options.targetUrl = '';
+    config.targetUrl = '';
 
     const response = await handler({
       request: {
@@ -113,8 +113,8 @@ describe('proxy', () => {
 
     assert.deepEqual(response, {
       response: {
-        text: 'Please set TARGET_URL in environment',
-        tts: 'ошибка',
+        text: 'Please set targetUrl in config.js',
+        tts: 'Ошибка',
         end_session: false
       },
       session: 1,
@@ -123,8 +123,8 @@ describe('proxy', () => {
   });
 
   it('custom error text', async () => {
-    options.targetUrl = '';
-    options.errorText = 'Повторите пожалуйста';
+    config.targetUrl = '';
+    config.errorText = 'Повторите пожалуйста';
 
     const response = await handler({
       request: {

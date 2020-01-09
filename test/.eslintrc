@@ -7,7 +7,7 @@
     "assert": false,
     "nock": false,
     "handler": false,
-    "options": false
+    "config": false
   },
 
   "plugins": [

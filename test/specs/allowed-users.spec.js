@@ -14,7 +14,7 @@ describe('allowed-users', () => {
         version: 2,
       });
 
-    options.allowedUsers = ['foo'];
+    config.allowedUsers = ['foo'];
 
     const response = await handler({
       request: {
@@ -44,7 +44,7 @@ describe('allowed-users', () => {
       .post('/')
       .reply(200, { });
 
-    options.allowedUsers = ['foo'];
+    config.allowedUsers = ['foo'];
 
     const response = await handler({
       request: {
