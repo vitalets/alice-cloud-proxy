@@ -1,29 +1,28 @@
-describe('proxy', () => {
+describe('errors', () => {
 
-  it('success', async () => {
-    const scope = nock('http://localhost')
-      .post('/')
-      .reply(200, {
-        response: {
-          text: 'bar'
-        }
-      });
+  it('no target url', async () => {
+    config.targetUrl = '';
 
     const response = await handler({
       request: {
         command: 'foo'
       },
+      session: 1,
+      version: 2,
     });
 
-    scope.done();
     assert.deepEqual(response, {
       response: {
-        text: 'bar'
-      }
+        text: 'Please set targetUrl in config.js',
+        tts: 'Ошибка',
+        end_session: false
+      },
+      session: 1,
+      version: 2,
     });
   });
 
-  it('timeout error', async () => {
+  it('http timeout', async () => {
     nock('http://localhost')
       .post('/')
       .delay(300)
@@ -100,28 +99,6 @@ describe('proxy', () => {
     });
   });
 
-  it('no target url', async () => {
-    config.targetUrl = '';
-
-    const response = await handler({
-      request: {
-        command: 'foo'
-      },
-      session: 1,
-      version: 2,
-    });
-
-    assert.deepEqual(response, {
-      response: {
-        text: 'Please set targetUrl in config.js',
-        tts: 'Ошибка',
-        end_session: false
-      },
-      session: 1,
-      version: 2,
-    });
-  });
-
   it('custom error text', async () => {
     config.targetUrl = '';
     config.errorText = 'Повторите пожалуйста';
@@ -166,7 +143,7 @@ describe('proxy', () => {
     });
   });
 
-  it('error: send telegram notification', async () => {
+  it('telegram notification', async () => {
     config.targetUrl = '';
     config.tgNotifyUrl = 'https://api.telegram.org/bot123/sendMessage?chat_id=456';
 

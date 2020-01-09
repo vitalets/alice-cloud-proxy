@@ -1,5 +1,9 @@
 describe('allowed-users', () => {
 
+  beforeEach(() => {
+    config.allowedUsers = ['foo'];
+  });
+
   it('allowed user', async () => {
     const scope = nock('http://localhost')
       .post('/')
@@ -13,8 +17,6 @@ describe('allowed-users', () => {
         },
         version: 2,
       });
-
-    config.allowedUsers = ['foo'];
 
     const response = await handler({
       request: {
@@ -43,8 +45,6 @@ describe('allowed-users', () => {
     const scope = nock('http://localhost')
       .post('/')
       .reply(200, { });
-
-    config.allowedUsers = ['foo'];
 
     const response = await handler({
       request: {
