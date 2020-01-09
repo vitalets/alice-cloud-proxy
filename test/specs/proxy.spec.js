@@ -23,7 +23,7 @@ describe('proxy', () => {
     });
   });
 
-  it('timeout', async () => {
+  it('timeout error', async () => {
     nock('http://localhost')
       .post('/')
       .delay(300)
@@ -164,6 +164,19 @@ describe('proxy', () => {
         text: 'bar',
       },
     });
+  });
+
+  it('error: send telegram notification', async () => {
+    config.targetUrl = '';
+    config.tgNotifyUrl = 'https://api.telegram.org/bot123/sendMessage?chat_id=456';
+
+    const scope = nock('https://api.telegram.org')
+      .post('/bot123/sendMessage?chat_id=456', body => body.text.includes('Please set targetUrl in config.js'))
+      .reply(200, { ok: true });
+
+    await handler({});
+
+    scope.done();
   });
 
 });

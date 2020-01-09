@@ -13,9 +13,11 @@ Object.assign(global, {
 });
 
 beforeEach(() => {
+  // reset config before each test
   config.targetUrl = 'http://localhost';
   config.timeout = 250;
   config.allowedUsers = [];
+  config.tgNotifyUrl = '';
 });
 
 afterEach(() => {

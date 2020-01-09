@@ -33,13 +33,14 @@ async function handleRequest({ reqBody, reqBodyStr }) {
     }
     const { targetUrl, timeout } = config;
     if (!targetUrl) {
-      return buildErrorResponse(reqBody, new Error('Please set targetUrl in config.js'));
+      throw new Error('Please set targetUrl in config.js');
     }
     return await Promise.race([
       proxyRequest(reqBodyStr, targetUrl, { timeout }),
       waitTimeout(timeout, `Target timeout: ${ timeout } ms`),
     ]);
   } catch (error) {
+    trySendTelegramNotification(error).catch(e => console.error(e));
     return buildErrorResponse(reqBody, error);
   }
 }
@@ -189,4 +190,26 @@ function buildNotAllowedResponse({ version, session }) {
 function isAllowedUser({ session }) {
   const { allowedUsers } = config;
   return !allowedUsers || !allowedUsers.length || allowedUsers.includes(session.user_id);
+}
+
+/**
+ * Send notification to telegram.
+ * see: https://core.telegram.org/bots/api#sendmessage
+ *
+ * @param {Error} error
+ */
+async function trySendTelegramNotification(error) {
+  const { tgNotifyUrl } = config;
+  if (tgNotifyUrl) {
+    const text = error.stack || error.message || String(error);
+    const body = JSON.stringify({ text });
+    const result = await sendRequest(tgNotifyUrl, {
+      method: 'POST',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+    }, body);
+    console.log(`NOTIFICATION SENT: ${result}`);
+  }
 }
