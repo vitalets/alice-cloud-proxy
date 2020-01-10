@@ -1,6 +1,9 @@
 const getHttp = () => require('http');
 const getHttps = () => require('https');
-const config = require('./config');
+const getConfig = () => require('./config');
+
+// Config is loaded inside request to catch possible syntax errors
+let config;
 
 /**
  * Entry point.
@@ -25,6 +28,7 @@ exports.handler = async reqBody => {
  */
 async function handleRequest({ reqBody, reqBodyStr }) {
   try {
+    loadConfig();
     if (isPing(reqBody)) {
       return buildPingResponse(reqBody);
     }
@@ -42,6 +46,21 @@ async function handleRequest({ reqBody, reqBodyStr }) {
   } catch (error) {
     trySendTelegramNotification(error).catch(e => console.error(e));
     return buildErrorResponse(reqBody, error);
+  }
+}
+
+/**
+ * Load config.js.
+ * It can throw in case of syntax errors.
+ */
+function loadConfig() {
+  /* istanbul ignore next */
+  try {
+    config = getConfig();
+  } catch(e) {
+    // выставляем в конфиг пустой объект, чтобы обработка ошибки не упала
+    config = {};
+    throw e;
   }
 }
 
