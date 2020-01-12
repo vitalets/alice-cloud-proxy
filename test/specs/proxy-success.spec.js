@@ -23,4 +23,25 @@ describe('proxy success', () => {
     });
   });
 
+  it('incorrect request: proxy to target anyway', async () => {
+    const scope = nock('http://localhost')
+      .post('/')
+      .reply(200, {
+        response: {
+          text: 'bar'
+        }
+      });
+
+    const response = await handler({
+      foo: 42
+    });
+
+    scope.done();
+    assert.deepEqual(response, {
+      response: {
+        text: 'bar',
+      },
+    });
+  });
+
 });
