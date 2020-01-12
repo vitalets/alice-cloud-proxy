@@ -220,7 +220,7 @@ function isAllowedUser({ session }) {
 async function trySendTelegramNotification(error) {
   const { tgNotifyUrl, tgNotifyPrefix } = config;
   if (tgNotifyUrl) {
-    const prefix = tgNotifyPrefix ? `[${tgNotifyPrefix}] ` : '';
+    const prefix = tgNotifyPrefix ? `${tgNotifyPrefix} ` : '';
     const text = `${prefix}${error.stack || error.message || error}`;
     const body = JSON.stringify({ text });
     const result = await sendRequest(tgNotifyUrl, {

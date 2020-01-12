@@ -146,7 +146,7 @@ describe('errors', () => {
   it('telegram notification', async () => {
     config.targetUrl = '';
     config.tgNotifyUrl = 'https://api.telegram.org/bot123/sendMessage?chat_id=456';
-    config.tgNotifyPrefix = 'тест';
+    config.tgNotifyPrefix = '[тест]';
 
     const scope = nock('https://api.telegram.org')
       .post('/bot123/sendMessage?chat_id=456',
