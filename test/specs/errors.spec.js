@@ -146,9 +146,12 @@ describe('errors', () => {
   it('telegram notification', async () => {
     config.targetUrl = '';
     config.tgNotifyUrl = 'https://api.telegram.org/bot123/sendMessage?chat_id=456';
+    config.tgNotifyPrefix = 'тест';
 
     const scope = nock('https://api.telegram.org')
-      .post('/bot123/sendMessage?chat_id=456', body => body.text.includes('Please set targetUrl in config.js'))
+      .post('/bot123/sendMessage?chat_id=456',
+          body => body.text.includes('[тест] Error: Please set targetUrl in config.js')
+      )
       .reply(200, { ok: true });
 
     await handler({});

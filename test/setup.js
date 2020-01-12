@@ -18,6 +18,7 @@ beforeEach(() => {
   config.timeout = 250;
   config.allowedUsers = [];
   config.tgNotifyUrl = '';
+  config.tgNotifyPrefix = '';
 });
 
 afterEach(() => {
