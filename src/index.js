@@ -39,10 +39,7 @@ async function handleRequest({ reqBody, reqBodyStr }) {
     if (!targetUrl) {
       throw new Error('Please set targetUrl in config.js');
     }
-    return await Promise.race([
-      proxyRequest(reqBodyStr, targetUrl, { timeout }),
-      waitTimeout(timeout, `Target timeout: ${ timeout } ms`),
-    ]);
+    return await proxyRequest(reqBodyStr, targetUrl, { timeout });
   } catch (error) {
     trySendTelegramNotification(error).catch(e => console.error(e));
     return buildErrorResponse(reqBody, error);
@@ -110,6 +107,16 @@ async function proxyRequest(reqBodyStr, targetUrl, { timeout } = {}) {
  */
 async function sendRequest(url, options, body) {
   return new Promise((resolve, reject) => {
+
+    // see: https://stackoverflow.com/questions/6129240/how-to-set-timeout-for-http-createclient-in-node-js
+    const timeout = options.timeout || 5000;
+    const timer = setTimeout(() => {
+      reject(new Error(`Request timeout: ${timeout} ms`));
+      if (!req.aborted) {
+        req.abort();
+      }
+    }, timeout);
+
     const httpModule = /^https/.test(url) ? getHttps() : getHttp();
     const req = httpModule.request(url, options || {}, res => {
       if (res.statusCode < 200 || res.statusCode >= 300) {
@@ -119,7 +126,10 @@ async function sendRequest(url, options, body) {
       res.setEncoding('utf8');
       let responseBody = '';
       res.on('data', chunk => responseBody += chunk);
-      res.on('end', () => resolve(responseBody));
+      res.on('end', () => {
+        clearTimeout(timer);
+        resolve(responseBody);
+      });
     });
 
     req.on('error', err => reject(err));
@@ -130,18 +140,6 @@ async function sendRequest(url, options, body) {
 
     req.end();
   });
-}
-
-/**
- * Promisified setTimeout.
- *
- * @param {Number} ms
- * @param {String} message
- * @returns {Promise}
- */
-async function waitTimeout(ms, message) {
-  return new Promise(resolve => setTimeout(resolve, ms))
-    .then(() => Promise.reject(new Error(message)));
 }
 
 /**
@@ -191,12 +189,12 @@ function buildErrorResponse({version, session}, error) {
  */
 function buildNotAllowedResponse({ version, session }) {
   return {
-    version,
-    session,
     response: {
       text: 'Это приватный навык. Для выхода скажите "Хватит".',
       end_session: false,
     },
+    session,
+    version,
   };
 }
 
@@ -220,11 +218,12 @@ function isAllowedUser({ session }) {
 async function trySendTelegramNotification(error) {
   const { tgNotifyUrl, tgNotifyPrefix } = config;
   if (tgNotifyUrl) {
-    const prefix = tgNotifyPrefix ? `${tgNotifyPrefix} ` : '';
-    const text = `${prefix}${error.stack || error.message || error}`;
+    console.log('NOTIFICATION: sending to telegram.');
+    const text = `${tgNotifyPrefix || ''} ${error.stack || error.message || error}`.trim();
     const body = JSON.stringify({ text });
     const result = await sendRequest(tgNotifyUrl, {
       method: 'POST',
+      timeout: 1000,
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
