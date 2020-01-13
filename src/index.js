@@ -167,8 +167,9 @@ function buildPingResponse({ session, version }) {
  * @returns {Object}
  */
 function buildErrorResponse({version, session}, error) {
-  console.error('ERROR:', error);
-  const text = config.errorText || (error && error.message) || String(error);
+  // убираем \n в ошибке, чтобы выглядело компактно в логах
+  console.error(`ERROR: ${error.stack || error.message || error}`.replace(/\n/g, ' '));
+  const text = config.errorText || error.message || String(error);
   const tts = config.errorText || 'Ошибка';
   return {
     response: {
