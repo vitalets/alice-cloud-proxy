@@ -17,12 +17,14 @@
 
 1. Создайте облачную функцию согласно [инструкции](https://yandex.ru/dev/dialogs/alice/doc/deploy-ycloud-function-docpage/) для Node.js
 2. Создайте в редакторе функции файл `index.js` и скопируйте туда код из [src/index.js](https://github.com/vitalets/alice-cloud-proxy/blob/master/src/index.js)
-3. Создайте в редакторе функции файл конфигурации `config.js` и скопируйте туда код из [src/config.js](https://github.com/vitalets/alice-cloud-proxy/blob/master/src/config.js)
-4. Сохраните изменения в функции, нажав на кнопку "Создать версию"
-4. [В панели разработчика](https://yandex.ru/dev/dialogs/alice/doc/publish-docpage/#publish) заведите тестовый приватный навык, который будете использовать как прокси для других навыков
-5. В настройках прокси-навыка укажите вашу функцию:
+3. Создайте в редакторе функции файл конфигурации `config.js` и скопируйте туда код из [src/config.js](https://github.com/vitalets/alice-cloud-proxy/blob/master/src/config.js).
+   Измените необходимые параметры под себя
+4. Укажите точку входа функции: `index.handler`
+5. Сохраните изменения в функции, нажав на кнопку "Создать версию"
+6. [В панели разработчика](https://yandex.ru/dev/dialogs/alice/doc/publish-docpage/#publish) заведите тестовый приватный навык, который будете использовать как прокси для других навыков
+7. В настройках прокси-навыка укажите вашу функцию:
    <img src="https://user-images.githubusercontent.com/1473072/66268276-79c6c280-e844-11e9-83c5-15fe37c32583.png" width="600"> 
-6. Сохраните изменения, перейдите на вкладку тестирование и проверьте, что проксирующий навык работает (должен отвечать *Please set targetUrl in config.js*):
+8. Сохраните изменения, перейдите на вкладку тестирование и проверьте, что проксирующий навык работает (должен отвечать *Please set targetUrl in config.js*):
    <img src="https://user-images.githubusercontent.com/1473072/66268399-b47d2a80-e845-11e9-97d3-11be682d94f6.png" width="600">
 
 ## Использование
