@@ -14,8 +14,7 @@
     "code": "eslint src test",
     "test": "mocha test/setup.js test/specs/**",
     "test:cov": "nyc --reporter=html --check-coverage --lines 95 npm t && nyc report",
-    "open:cov": "open coverage/index.html",
-    "toc": "markdown-toc README.md -i"
+    "open:cov": "open coverage/index.html"
   },
   "main": "src/index.js",
   "engines": {
@@ -37,7 +36,6 @@
     "eslint-plugin-mocha": "^6.2.2",
     "husky": "^3.1.0",
     "lint-staged": "^9.5.0",
-    "markdown-toc": "^1.2.0",
     "mocha": "^6.2.2",
     "nock": "^11.7.1",
     "nyc": "^14.1.1"
