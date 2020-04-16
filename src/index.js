@@ -90,6 +90,7 @@ function isPing(reqBody) {
  */
 async function proxyRequest(ctx, targetUrl, { timeout } = {}) {
   ctx.logger.log(`PROXY TO: ${targetUrl}`);
+  const now = Date.now();
   const options = {
     method: 'POST',
     headers: {
@@ -99,6 +100,7 @@ async function proxyRequest(ctx, targetUrl, { timeout } = {}) {
     timeout,
   };
   const resBodyStr = await sendRequest(targetUrl, options, ctx.reqBodyStr);
+  ctx.logger.log(`PROXY OK: ${Date.now() - now} ms`);
   return JSON.parse(resBodyStr);
 }
 
