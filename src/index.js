@@ -248,9 +248,9 @@ async function trySendTelegramNotification(ctx, error) {
  */
 class Logger {
   constructor(ctx) {
-    const prefix = ctx.requestId.slice(0, 6);
-    this.log = (...args) => console.log(`[${prefix}]`, ...args);
-    this.warn = (...args) => console.warn(`[${prefix}]`, ...args);
-    this.error = (...args) => console.error(`[${prefix}]`, ...args);
+    const prefix = `[ ${ctx.requestId.slice(0, 8)} ]`;
+    this.log = (...args) => console.log(prefix, ...args);
+    this.warn = (...args) => console.warn(prefix, ...args);
+    this.error = (...args) => console.error(prefix, ...args);
   }
 }
