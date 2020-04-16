@@ -3,7 +3,7 @@ describe('errors', () => {
   it('no target url', async () => {
     config.targetUrl = '';
 
-    const response = await handler({
+    const response = await callHandler({
       request: {
         command: 'foo'
       },
@@ -28,7 +28,7 @@ describe('errors', () => {
       .delay(300)
       .reply(200);
 
-    const response = await handler({
+    const response = await callHandler({
       request: {
         command: 'foo'
       },
@@ -54,7 +54,7 @@ describe('errors', () => {
       // see: https://github.com/nock/nock/issues/469
       .reply(500);
 
-    const response = await handler({
+    const response = await callHandler({
       request: {
         command: 'foo'
       },
@@ -79,7 +79,7 @@ describe('errors', () => {
       .post('/')
       .replyWithError('err message');
 
-    const response = await handler({
+    const response = await callHandler({
       request: {
         command: 'foo'
       },
@@ -103,7 +103,7 @@ describe('errors', () => {
     config.targetUrl = '';
     config.errorText = 'Повторите пожалуйста';
 
-    const response = await handler({
+    const response = await callHandler({
       request: {
         command: 'foo'
       },
@@ -133,7 +133,7 @@ describe('errors', () => {
       )
       .reply(200, { ok: true });
 
-    await handler({});
+    await callHandler({});
 
     scope.done();
   });

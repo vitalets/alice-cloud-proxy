@@ -6,7 +6,7 @@
   "globals": {
     "assert": false,
     "nock": false,
-    "handler": false,
+    "callHandler": false,
     "config": false
   },
 

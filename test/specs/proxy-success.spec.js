@@ -9,7 +9,7 @@ describe('proxy success', () => {
         }
       });
 
-    const response = await handler({
+    const response = await callHandler({
       request: {
         command: 'foo'
       },
@@ -32,7 +32,7 @@ describe('proxy success', () => {
         }
       });
 
-    const response = await handler({
+    const response = await callHandler({
       foo: 42
     });
 

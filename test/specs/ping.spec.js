@@ -5,7 +5,7 @@ describe('ping', () => {
       .post('/')
       .reply(200, { });
 
-    const response = await handler({
+    const response = await callHandler({
       request: {
         command: 'ping'
       },

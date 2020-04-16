@@ -9,24 +9,29 @@ let config;
  * Entry point.
  *
  * @param {Object} reqBody
+ * @param {Object} cloudContext
  * @returns {Promise}
  */
-exports.handler = async reqBody => {
-  const reqBodyStr = JSON.stringify(reqBody);
-  console.log(`REQUEST: ${reqBodyStr}`);
-  const resBody = await handleRequest({ reqBody, reqBodyStr });
-  console.log(`RESPONSE: ${JSON.stringify(resBody.response)}`);
-  return resBody;
+exports.handler = async (reqBody, cloudContext) => {
+  const ctx = {};
+  ctx.requestId = cloudContext && cloudContext.requestId || 'unknown';
+  ctx.reqBody = reqBody;
+  ctx.logger = new Logger(ctx);
+  ctx.reqBodyStr = JSON.stringify(reqBody);
+  ctx.logger.log(`REQUEST: ${ctx.reqBodyStr}`);
+  ctx.resBody = await handleRequest(ctx);
+  ctx.logger.log(`RESPONSE: ${JSON.stringify(ctx.resBody.response)}`);
+  return ctx.resBody;
 };
 
 /**
  * Handles request.
  *
- * @param {Object} reqBody
- * @param {String} reqBodyStr
+ * @param {Object} ctx
  * @returns {Promise}
  */
-async function handleRequest({ reqBody, reqBodyStr }) {
+async function handleRequest(ctx) {
+  const { reqBody } = ctx;
   try {
     loadConfig();
     if (isPing(reqBody)) {
@@ -39,10 +44,10 @@ async function handleRequest({ reqBody, reqBodyStr }) {
     if (!targetUrl) {
       throw new Error('Please set targetUrl in config.js');
     }
-    return await proxyRequest(reqBodyStr, targetUrl, { timeout });
+    return await proxyRequest(ctx, targetUrl, { timeout });
   } catch (error) {
-    trySendTelegramNotification(error).catch(e => console.error(e));
-    return buildErrorResponse(reqBody, error);
+    trySendTelegramNotification(ctx, error).catch(e => ctx.logger.error(e));
+    return buildErrorResponse(ctx, error);
   }
 }
 
@@ -78,13 +83,13 @@ function isPing(reqBody) {
 /**
  * Proxies request to target url.
  *
- * @param {String} reqBodyStr
+ * @param {object} ctx
  * @param {String} targetUrl
  * @param {Number} timeout
  * @returns {Promise<Object>}
  */
-async function proxyRequest(reqBodyStr, targetUrl, { timeout } = {}) {
-  console.log(`PROXY TO: ${targetUrl}`);
+async function proxyRequest(ctx, targetUrl, { timeout } = {}) {
+  ctx.logger.log(`PROXY TO: ${targetUrl}`);
   const options = {
     method: 'POST',
     headers: {
@@ -93,7 +98,7 @@ async function proxyRequest(reqBodyStr, targetUrl, { timeout } = {}) {
     },
     timeout,
   };
-  const resBodyStr = await sendRequest(targetUrl, options, reqBodyStr);
+  const resBodyStr = await sendRequest(targetUrl, options, ctx.reqBodyStr);
   return JSON.parse(resBodyStr);
 }
 
@@ -162,13 +167,14 @@ function buildPingResponse({ session, version }) {
 /**
  * Builds alice response for error.
  *
- * @param {Object} event
+ * @param {Object} ctx
  * @param {Error} error
  * @returns {Object}
  */
-function buildErrorResponse({version, session}, error) {
+function buildErrorResponse(ctx, error) {
+  const { version, session } = ctx.reqBody;
   // убираем \n в ошибке, чтобы выглядело компактно в логах
-  console.error(`ERROR: ${error.stack || error.message || error}`.replace(/\n/g, ' '));
+  ctx.logger.error(`ERROR: ${error.stack || error.message || error}`.replace(/\n/g, ' '));
   const text = config.errorText || error.message || String(error);
   const tts = config.errorText || 'Ошибка';
   return {
@@ -214,12 +220,13 @@ function isAllowedUser({ session }) {
  * Send notification to telegram.
  * see: https://core.telegram.org/bots/api#sendmessage
  *
+ * @param {Object} ctx
  * @param {Error} error
  */
-async function trySendTelegramNotification(error) {
+async function trySendTelegramNotification(ctx, error) {
   const { tgNotifyUrl, tgNotifyPrefix } = config;
   if (tgNotifyUrl) {
-    console.log('NOTIFICATION: sending to telegram.');
+    ctx.logger.log('NOTIFICATION: sending to telegram.');
     const text = `${tgNotifyPrefix || ''} ${error.stack || error.message || error}`.trim();
     const body = JSON.stringify({ text });
     const result = await sendRequest(tgNotifyUrl, {
@@ -230,6 +237,18 @@ async function trySendTelegramNotification(error) {
         'Content-Type': 'application/json',
       },
     }, body);
-    console.log(`NOTIFICATION SENT: ${result}`);
+    ctx.logger.log(`NOTIFICATION SENT: ${result}`);
+  }
+}
+
+/**
+ * Logger.
+ */
+class Logger {
+  constructor(ctx) {
+    const prefix = ctx.requestId.slice(0, 6);
+    this.log = (...args) => console.log(`[${prefix}]`, ...args);
+    this.warn = (...args) => console.warn(`[${prefix}]`, ...args);
+    this.error = (...args) => console.error(`[${prefix}]`, ...args);
   }
 }
