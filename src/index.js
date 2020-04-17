@@ -114,6 +114,7 @@ async function proxyRequest(ctx, targetUrl, { timeout } = {}) {
  */
 async function sendRequest(url, options, body) {
   return new Promise((resolve, reject) => {
+    options = options || {};
 
     // see: https://stackoverflow.com/questions/6129240/how-to-set-timeout-for-http-createclient-in-node-js
     const timeout = options.timeout || 5000;
@@ -125,7 +126,7 @@ async function sendRequest(url, options, body) {
     }, timeout);
 
     const httpModule = /^https/.test(url) ? getHttps() : getHttp();
-    const req = httpModule.request(url, options || {}, res => {
+    const req = httpModule.request(url, options, res => {
       if (res.statusCode < 200 || res.statusCode >= 300) {
         const error = new Error(`${res.statusCode} ${res.statusMessage} ${url}`);
         return reject(error);
