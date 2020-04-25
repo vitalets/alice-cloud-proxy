@@ -7,17 +7,21 @@ describe('errors', () => {
       request: {
         command: 'foo'
       },
-      session: 1,
+      session: {
+        user_id: '123'
+      },
       version: 2,
     });
 
     assert.deepEqual(response, {
       response: {
-        text: 'Please set targetUrl in config.js',
+        text: 'Please set targetUrl in config.js (userId: 123)',
         tts: 'Ошибка',
         end_session: false
       },
-      session: 1,
+      session: {
+        user_id: '123'
+      },
       version: 2,
     });
   });
@@ -32,17 +36,21 @@ describe('errors', () => {
       request: {
         command: 'foo'
       },
-      session: 1,
+      session: {
+        user_id: '123456_78'
+      },
       version: 2,
     });
 
     assert.deepEqual(response, {
       response: {
-        text: 'Request timeout: 250 ms',
+        text: 'Request timeout: 250 ms (userId: 123456)', // userId обрезается до 6 символов
         tts: 'Ошибка',
         end_session: false
       },
-      session: 1,
+      session: {
+        user_id: '123456_78'
+      },
       version: 2,
     });
   });
@@ -58,18 +66,22 @@ describe('errors', () => {
       request: {
         command: 'foo'
       },
-      session: 1,
+      session: {
+        user_id: '123'
+      },
       version: 2,
     });
 
     scope.done();
     assert.deepEqual(response, {
       response: {
-        text: '500 null http://localhost',
+        text: '500 null http://localhost (userId: 123)',
         tts: 'Ошибка',
         end_session: false
       },
-      session: 1,
+      session: {
+        user_id: '123'
+      },
       version: 2,
     });
   });
@@ -83,18 +95,22 @@ describe('errors', () => {
       request: {
         command: 'foo'
       },
-      session: 1,
+      session: {
+        user_id: '123'
+      },
       version: 2,
     });
 
     scope.done();
     assert.deepEqual(response, {
       response: {
-        text: 'err message',
+        text: 'err message (userId: 123)',
         tts: 'Ошибка',
         end_session: false
       },
-      session: 1,
+      session: {
+        user_id: '123'
+      },
       version: 2,
     });
   });
@@ -107,7 +123,9 @@ describe('errors', () => {
       request: {
         command: 'foo'
       },
-      session: 1,
+      session: {
+        user_id: '123'
+      },
       version: 2,
     });
 
@@ -117,7 +135,9 @@ describe('errors', () => {
         tts: 'Повторите пожалуйста',
         end_session: false
       },
-      session: 1,
+      session: {
+        user_id: '123'
+      },
       version: 2,
     });
   });
@@ -129,13 +149,48 @@ describe('errors', () => {
 
     const scope = nock('https://api.telegram.org')
       .post('/bot123/sendMessage?chat_id=456',
-          body => body.text.includes('[тест] Error: Please set targetUrl in config.js')
+          body => body.text.includes('[тест] Error: Please set targetUrl in config.js (userId: 123)')
       )
       .reply(200, { ok: true });
 
-    await callHandler({});
+    await callHandler({
+      request: {
+        command: 'foo'
+      },
+      session: {
+        user_id: '123'
+      },
+      version: 2,
+    });
 
     scope.done();
+  });
+
+  it('if no user id, just dont attach it to error', async () => {
+    config.targetUrl = '';
+
+    const response = await callHandler({
+      request: {
+        command: 'foo'
+      },
+      session: {
+        // no user_id field
+        // user_id: '123'
+      },
+      version: 2,
+    });
+
+    assert.deepEqual(response, {
+      response: {
+        text: 'Please set targetUrl in config.js',
+        tts: 'Ошибка',
+        end_session: false
+      },
+      session: {
+
+      },
+      version: 2,
+    });
   });
 
 });

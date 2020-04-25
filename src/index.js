@@ -2,7 +2,7 @@ const getHttp = () => require('http');
 const getHttps = () => require('https');
 const getConfig = () => require('./config');
 
-// Config is loaded inside request to catch possible syntax errors
+// Config is loaded inside request to catch possible syntax errors (to keep skill responding if you break config)
 let config;
 
 /**
@@ -46,6 +46,7 @@ async function handleRequest(ctx) {
     }
     return await proxyRequest(ctx, targetUrl, { timeout });
   } catch (error) {
+    attachUserIdToError(error, ctx);
     trySendTelegramNotification(ctx, error).catch(e => ctx.logger.error(e));
     return buildErrorResponse(ctx, error);
   }
@@ -253,5 +254,22 @@ class Logger {
     this.log = (...args) => console.log(prefix, ...args);
     this.warn = (...args) => console.warn(prefix, ...args);
     this.error = (...args) => console.error(prefix, ...args);
+  }
+}
+
+/**
+ * Attache user_id to error message.
+ *
+ * @param {Error} error
+ * @param {Object} ctx
+ * @returns {Error}
+ */
+function attachUserIdToError(error, ctx) {
+  try {
+    const userId = ctx.reqBody.session.user_id.slice(0, 6);
+    error.message += ` (userId: ${userId})`;
+    return error;
+  } catch (e) {
+    return error;
   }
 }
