@@ -18,7 +18,7 @@
     "max-params": ["error", {"max" : 4}],
     "max-statements": ["error", {"max" : 15}, {"ignoreTopLevelFunctions": false}],
     "max-len": ["error", {"code" : 120, "ignoreUrls": true}],
-    "max-lines": ["error", {"max": 200, "skipComments": true, "skipBlankLines": true}],
+    "max-lines": ["error", {"max": 250, "skipComments": true, "skipBlankLines": true}],
     "semi": ["error", "always"],
     "space-before-function-paren": ["error", {"anonymous": "always", "named": "never", "asyncArrow": "always"}]
   }

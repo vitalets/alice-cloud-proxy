@@ -8,54 +8,71 @@ describe('errors', () => {
         command: 'foo'
       },
       session: {
-        user_id: '123'
+        user_id: '123456_78'
       },
       version: 2,
     });
 
     assert.deepEqual(response, {
       response: {
-        text: 'Please set targetUrl in config.js (userId: 123)',
+        // userId обрезается до 6 символов
+        text: 'Please set targetUrl in config.js (userId: 123456)',
         tts: 'Ошибка',
         end_session: false
       },
       session: {
-        user_id: '123'
+        user_id: '123456_78'
       },
       version: 2,
     });
   });
 
-  it('http timeout', async () => {
+  it('proxy http timeout', async () => {
     nock('http://localhost')
       .post('/')
       .delay(300)
       .reply(200);
 
-    const response = await callFn({
+    const { response } = await callFn({
       request: {
         command: 'foo'
       },
       session: {
-        user_id: '123456_78'
+        user_id: '123'
       },
       version: 2,
     });
 
-    assert.deepEqual(response, {
-      response: {
-        text: 'Request timeout: 250 ms (userId: 123456)', // userId обрезается до 6 символов
-        tts: 'Ошибка',
-        end_session: false
-      },
-      session: {
-        user_id: '123456_78'
-      },
-      version: 2,
-    });
+    assert.include(response.text, 'Request timeout: 250 ms');
+    assert.include(response.text, '(socket:');
+    assert.include(response.text, '(userId: 123)');
   });
 
-  it('http error', async () => {
+  // Чтобы это протестить нужно дополнительно подписываться req.on('timeout') и все аккуратно чистить.
+  // Пока лучше оставиим общий таймаут, а время коннекта к сокету будем смотреть по событию socket.
+  // https://github.com/nock/nock#socket-timeout
+  it.skip('proxy socket timeout', async () => {
+    nock('http://localhost')
+      .post('/')
+      .socketDelay(300)
+      .reply(200);
+
+    const { response } = await callFn({
+      request: {
+        command: 'foo'
+      },
+      session: {
+        user_id: '123'
+      },
+      version: 2,
+    });
+
+    assert.include(response.text, 'Request timeout: 250 ms');
+    assert.include(response.text, '(socket:');
+    assert.include(response.text, '(userId: 123)');
+  });
+
+  it('proxy 500', async () => {
     const scope = nock('http://localhost')
       .post('/')
       // nock can't set statusMessage
@@ -76,6 +93,35 @@ describe('errors', () => {
     assert.deepEqual(response, {
       response: {
         text: '500 null http://localhost (userId: 123)',
+        tts: 'Ошибка',
+        end_session: false
+      },
+      session: {
+        user_id: '123'
+      },
+      version: 2,
+    });
+  });
+
+  it('proxy invalid JSON', async () => {
+    const scope = nock('http://localhost')
+      .post('/')
+      .reply(200);
+
+    const response = await callFn({
+      request: {
+        command: 'foo'
+      },
+      session: {
+        user_id: '123'
+      },
+      version: 2,
+    });
+
+    scope.done();
+    assert.deepEqual(response, {
+      response: {
+        text: 'Unexpected end of JSON input (userId: 123)',
         tts: 'Ошибка',
         end_session: false
       },

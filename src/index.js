@@ -130,16 +130,18 @@ async function sendRequest(url, options, body) {
   return new Promise((resolve, reject) => {
     options = options || {};
 
+    const httpModule = /^https/.test(url) ? getHttps() : getHttp();
+
     // see: https://stackoverflow.com/questions/6129240/how-to-set-timeout-for-http-createclient-in-node-js
     const timeout = options.timeout || 5000;
+    const timings = new Timings();
     const timer = setTimeout(() => {
-      reject(new Error(`Request timeout: ${timeout} ms`));
+      reject(new Error(`Request timeout: ${timeout} ms (${timings})`));
       if (!req.aborted) {
         req.abort();
       }
     }, timeout);
 
-    const httpModule = /^https/.test(url) ? getHttps() : getHttp();
     const req = httpModule.request(url, options, res => {
       if (res.statusCode < 200 || res.statusCode >= 300) {
         const error = new Error(`${res.statusCode} ${res.statusMessage} ${url}`);
@@ -147,14 +149,22 @@ async function sendRequest(url, options, body) {
       }
       res.setEncoding('utf8');
       let responseBody = '';
-      res.on('data', chunk => responseBody += chunk);
+      res.on('data', chunk => {
+        responseBody += chunk;
+      });
       res.on('end', () => {
         clearTimeout(timer);
         resolve(responseBody);
       });
     });
 
-    req.on('error', err => reject(err));
+    req.on('error', err => {
+      timings.add(`error_${err.code}`);
+      reject(err);
+    });
+
+    req.on('socket', () => timings.add('socket'));
+    req.on('response', () => timings.add('response'));
 
     if (body) {
       req.write(body);
@@ -267,6 +277,27 @@ class Logger {
     this.log = (...args) => console.log(prefix, ...args);
     this.warn = (...args) => console.warn(prefix, ...args);
     this.error = (...args) => console.error(prefix, ...args);
+  }
+}
+
+/**
+ * Measure events timings and return as string.
+ */
+class Timings {
+  constructor() {
+    this._startTime = Date.now();
+    this._events = [];
+  }
+
+  /**
+   * @param {string} event
+   */
+  add(event) {
+    this._events.push({ event, time: Date.now() });
+  }
+
+  toString() {
+    return this._events.map(({ event, time }) => `${event}:${time - this._startTime}ms`).join(', ');
   }
 }
 
