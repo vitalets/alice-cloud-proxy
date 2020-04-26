@@ -87,6 +87,7 @@ function isPing(reqBody) {
 function getTargetUrl(ctx) {
   if (config.targetUrl) {
     return config.targetUrl
+      // todo: encode uri component?
       .replace('{userId}', getShortUserId(ctx));
   } else {
     throw new Error('Please set targetUrl in config.js');
