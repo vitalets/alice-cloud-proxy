@@ -5,12 +5,12 @@ const config = require('../src/config');
 
 chai.config.truncateThreshold = 0;
 
-const callHandler = reqBody => handler(reqBody, { requestId: '12345678' });
+const callFn = reqBody => handler(reqBody, { requestId: '12345678' });
 
 Object.assign(global, {
   assert: chai.assert,
   nock,
-  callHandler,
+  callFn,
   config,
 });
 

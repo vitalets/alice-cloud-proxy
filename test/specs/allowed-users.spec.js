@@ -18,7 +18,7 @@ describe('allowed-users', () => {
         version: 2,
       });
 
-    const response = await callHandler({
+    const response = await callFn({
       request: {
         command: 'hello'
       },
@@ -46,7 +46,7 @@ describe('allowed-users', () => {
       .post('/')
       .reply(200, { });
 
-    const response = await callHandler({
+    const response = await callFn({
       request: {
         command: 'hello'
       },

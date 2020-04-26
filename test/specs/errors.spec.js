@@ -3,7 +3,7 @@ describe('errors', () => {
   it('no target url', async () => {
     config.targetUrl = '';
 
-    const response = await callHandler({
+    const response = await callFn({
       request: {
         command: 'foo'
       },
@@ -32,7 +32,7 @@ describe('errors', () => {
       .delay(300)
       .reply(200);
 
-    const response = await callHandler({
+    const response = await callFn({
       request: {
         command: 'foo'
       },
@@ -62,7 +62,7 @@ describe('errors', () => {
       // see: https://github.com/nock/nock/issues/469
       .reply(500);
 
-    const response = await callHandler({
+    const response = await callFn({
       request: {
         command: 'foo'
       },
@@ -91,7 +91,7 @@ describe('errors', () => {
       .post('/')
       .replyWithError('err message');
 
-    const response = await callHandler({
+    const response = await callFn({
       request: {
         command: 'foo'
       },
@@ -119,7 +119,7 @@ describe('errors', () => {
     config.targetUrl = '';
     config.errorText = 'Повторите пожалуйста';
 
-    const response = await callHandler({
+    const response = await callFn({
       request: {
         command: 'foo'
       },
@@ -153,7 +153,7 @@ describe('errors', () => {
       )
       .reply(200, { ok: true });
 
-    await callHandler({
+    await callFn({
       request: {
         command: 'foo'
       },
@@ -169,7 +169,7 @@ describe('errors', () => {
   it('if no user id, just dont attach it to error', async () => {
     config.targetUrl = '';
 
-    const response = await callHandler({
+    const response = await callFn({
       request: {
         command: 'foo'
       },

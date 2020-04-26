@@ -5,7 +5,7 @@ describe('proxy success', () => {
       .post('/')
       .reply(200, { response: { text: 'bar' } });
 
-    const response = await callHandler({ request: { command: 'foo' } });
+    const response = await callFn({ request: { command: 'foo' } });
 
     scope.done();
     assert.deepEqual(response, { response: { text: 'bar' } });
@@ -16,7 +16,7 @@ describe('proxy success', () => {
       .post('/')
       .reply(200, { response: { text: 'bar' } });
 
-    const response = await callHandler({ foo: 42 });
+    const response = await callFn({ foo: 42 });
 
     scope.done();
     assert.deepEqual(response, { response: { text: 'bar' } });
@@ -29,7 +29,7 @@ describe('proxy success', () => {
       .post('/?userId=123456')
       .reply(200, { response: { text: 'bar' } });
 
-    const response = await callHandler({
+    const response = await callFn({
       request: {
         command: 'foo'
       },
