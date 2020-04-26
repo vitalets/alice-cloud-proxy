@@ -40,11 +40,8 @@ async function handleRequest(ctx) {
     if (!isAllowedUser(reqBody)) {
       return buildNotAllowedResponse(reqBody);
     }
-    const { targetUrl, timeout } = config;
-    if (!targetUrl) {
-      throw new Error('Please set targetUrl in config.js');
-    }
-    return await proxyRequest(ctx, targetUrl, { timeout });
+    const targetUrl = getTargetUrl(ctx);
+    return await proxyRequest(ctx, targetUrl, { timeout: config.timeout });
   } catch (error) {
     attachUserIdToError(error, ctx);
     trySendTelegramNotification(ctx, error).catch(e => ctx.logger.error(e));
@@ -78,6 +75,21 @@ function isPing(reqBody) {
     return reqBody.request.command === 'ping';
   } catch (e) {
     return false;
+  }
+}
+
+/**
+ * Returns target proxy url with inserted placeholders.
+ *
+ * @param {Object} ctx
+ * @returns {String}
+ */
+function getTargetUrl(ctx) {
+  if (config.targetUrl) {
+    return config.targetUrl
+      .replace('{userId}', getShortUserId(ctx));
+  } else {
+    throw new Error('Please set targetUrl in config.js');
   }
 }
 
@@ -258,7 +270,7 @@ class Logger {
 }
 
 /**
- * Attache user_id to error message.
+ * Attach user_id to error message.
  *
  * @param {Error} error
  * @param {Object} ctx
@@ -266,10 +278,27 @@ class Logger {
  */
 function attachUserIdToError(error, ctx) {
   try {
-    const userId = ctx.reqBody.session.user_id.slice(0, 6);
-    error.message += ` (userId: ${userId})`;
+    const userId = getShortUserId(ctx);
+    if (userId) {
+      error.message += ` (userId: ${userId})`;
+    }
     return error;
+  } catch (e) /* istanbul ignore next */ {
+    return error;
+  }
+}
+
+/**
+ * Extracts user_id truncated to 6 chars.
+ *
+ * @param {Object} ctx
+ * @returns {String}
+ */
+function getShortUserId(ctx) {
+  try {
+    return ctx.reqBody.session.user_id.slice(0, 6);
   } catch (e) {
-    return error;
+    ctx.logger.error(`Can't extract userId from request: ${e.message}`);
+    return '';
   }
 }
