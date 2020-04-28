@@ -132,7 +132,8 @@ async function sendRequest(url, options, body) {
     const timeout = options.timeout || 5000;
     const timings = new Timings();
     const timer = setTimeout(() => {
-      reject(new Error(`Request timeout: ${timeout} ms (${timings})`));
+      const error = new Error(`Request timeout: ${timeout} ms (${timings}) ${url}`);
+      reject(error);
       if (!req.aborted) {
         req.abort();
       }

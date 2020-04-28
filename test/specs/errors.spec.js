@@ -44,6 +44,7 @@ describe('errors', () => {
 
     assert.include(response.text, 'Request timeout: 250 ms');
     assert.include(response.text, '(socket:');
+    assert.include(response.text, 'http://localhost');
   });
 
   // Чтобы это протестить нужно дополнительно подписываться req.on('timeout') и все аккуратно чистить.
