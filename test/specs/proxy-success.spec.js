@@ -11,7 +11,7 @@ describe('proxy success', () => {
     assert.deepEqual(response, { response: { text: 'bar' } });
   });
 
-  it('incorrect request: proxy to target anyway', async () => {
+  it('incorrect request format: proxy to target anyway', async () => {
     const scope = nock('http://localhost')
       .post('/')
       .reply(200, { response: { text: 'bar' } });
@@ -22,19 +22,21 @@ describe('proxy success', () => {
     assert.deepEqual(response, { response: { text: 'bar' } });
   });
 
-  it('proxy to url with placeholders', async () => {
-    config.targetUrl = 'http://localhost/?userId={userId}';
-
-    const scope = nock('http://localhost')
-      .post('/?userId=123456')
-      .reply(200, { response: { text: 'bar' } });
+  it('add x-alice-user-id header', async () => {
+    const scope = nock('http://localhost', {
+      reqheaders: {
+        'x-alice-user-id': 'user12345678'
+      },
+    })
+      .post('/')
+      .reply(200, {response: {text: 'bar'}});
 
     const response = await callFn({
       request: {
         command: 'foo'
       },
       session: {
-        user_id: '123456_78'
+        user_id: 'user12345678'
       },
       version: 2,
     });

@@ -8,20 +8,19 @@ describe('errors', () => {
         command: 'foo'
       },
       session: {
-        user_id: '123456_78'
+        user_id: 'user12345678'
       },
       version: 2,
     });
 
     assert.deepEqual(response, {
       response: {
-        // userId обрезается до 6 символов
-        text: 'Please set targetUrl in config.js (userId: 123456)',
+        text: 'Please set targetUrl in config.js [req123, user12]',
         tts: 'Ошибка',
         end_session: false
       },
       session: {
-        user_id: '123456_78'
+        user_id: 'user12345678'
       },
       version: 2,
     });
@@ -45,7 +44,6 @@ describe('errors', () => {
 
     assert.include(response.text, 'Request timeout: 250 ms');
     assert.include(response.text, '(socket:');
-    assert.include(response.text, '(userId: 123)');
   });
 
   // Чтобы это протестить нужно дополнительно подписываться req.on('timeout') и все аккуратно чистить.
@@ -92,7 +90,7 @@ describe('errors', () => {
     scope.done();
     assert.deepEqual(response, {
       response: {
-        text: '500 null http://localhost (userId: 123)',
+        text: '500 null http://localhost [req123, 123]',
         tts: 'Ошибка',
         end_session: false
       },
@@ -113,7 +111,7 @@ describe('errors', () => {
         command: 'foo'
       },
       session: {
-        user_id: '123'
+        user_id: 'user1234'
       },
       version: 2,
     });
@@ -121,12 +119,12 @@ describe('errors', () => {
     scope.done();
     assert.deepEqual(response, {
       response: {
-        text: 'Unexpected end of JSON input (userId: 123)',
+        text: 'Unexpected end of JSON input [req123, user12]',
         tts: 'Ошибка',
         end_session: false
       },
       session: {
-        user_id: '123'
+        user_id: 'user1234'
       },
       version: 2,
     });
@@ -150,7 +148,7 @@ describe('errors', () => {
     scope.done();
     assert.deepEqual(response, {
       response: {
-        text: 'err message (userId: 123)',
+        text: 'err message [req123, 123]',
         tts: 'Ошибка',
         end_session: false
       },
@@ -195,7 +193,7 @@ describe('errors', () => {
 
     const scope = nock('https://api.telegram.org')
       .post('/bot123/sendMessage?chat_id=456',
-          body => body.text.includes('[тест] Error: Please set targetUrl in config.js (userId: 123)')
+          body => body.text.includes('[тест] Please set targetUrl in config.js [req123, user12]')
       )
       .reply(200, { ok: true });
 
@@ -204,7 +202,7 @@ describe('errors', () => {
         command: 'foo'
       },
       session: {
-        user_id: '123'
+        user_id: 'user1234'
       },
       version: 2,
     });
@@ -228,7 +226,7 @@ describe('errors', () => {
 
     assert.deepEqual(response, {
       response: {
-        text: 'Please set targetUrl in config.js',
+        text: 'Please set targetUrl in config.js [req123]',
         tts: 'Ошибка',
         end_session: false
       },

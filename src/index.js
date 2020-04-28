@@ -40,11 +40,10 @@ async function handleRequest(ctx) {
     if (!isAllowedUser(reqBody)) {
       return buildNotAllowedResponse(reqBody);
     }
-    const targetUrl = getTargetUrl(ctx);
-    return await proxyRequest(ctx, targetUrl, { timeout: config.timeout });
+    return await proxyRequest(ctx);
   } catch (error) {
-    attachUserIdToError(error, ctx);
-    trySendTelegramNotification(ctx, error).catch(e => ctx.logger.error(e));
+    logError(ctx, error);
+    sendErrorToTelegram(ctx, error).catch(e => ctx.logger.error(e));
     return buildErrorResponse(ctx, error);
   }
 }
@@ -79,30 +78,26 @@ function isPing(reqBody) {
 }
 
 /**
- * Returns target proxy url with inserted placeholders.
+ * Returns target proxy url from config.
  *
- * @param {Object} ctx
  * @returns {String}
  */
-function getTargetUrl(ctx) {
-  if (config.targetUrl) {
-    return config.targetUrl
-      // todo: encode uri component?
-      .replace('{userId}', getShortUserId(ctx));
-  } else {
+function getTargetUrl() {
+  if (!config.targetUrl) {
     throw new Error('Please set targetUrl in config.js');
   }
+  return config.targetUrl;
 }
 
 /**
  * Proxies request to target url.
  *
  * @param {object} ctx
- * @param {String} targetUrl
- * @param {Number} timeout
  * @returns {Promise<Object>}
  */
-async function proxyRequest(ctx, targetUrl, { timeout } = {}) {
+async function proxyRequest(ctx) {
+  const targetUrl = getTargetUrl();
+  const timeout = config.timeout;
   ctx.logger.log(`PROXY TO: ${targetUrl}`);
   const now = Date.now();
   const options = {
@@ -110,6 +105,7 @@ async function proxyRequest(ctx, targetUrl, { timeout } = {}) {
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
+      'X-Alice-User-Id': getUserId(ctx),
     },
     timeout,
   };
@@ -200,10 +196,8 @@ function buildPingResponse({ session, version }) {
  */
 function buildErrorResponse(ctx, error) {
   const { version, session } = ctx.reqBody;
-  // убираем \n в ошибке, чтобы выглядело компактно в логах
-  ctx.logger.error(`ERROR: ${error.stack || error.message || error}`.replace(/\n/g, ' '));
-  const text = config.errorText || error.message || String(error);
-  const tts = config.errorText || 'Ошибка';
+  const text = (config && config.errorText) || `${error.message} ${ctx.logger.prefix}`;
+  const tts = (config && config.errorText) || 'Ошибка';
   return {
     response: {
       text,
@@ -244,17 +238,28 @@ function isAllowedUser({ session }) {
 }
 
 /**
+ * Log error to console.
+ *
+ * @param {object} ctx
+ * @param {error} error
+ */
+function logError(ctx, error) {
+  // убираем \n в ошибке, чтобы выглядело компактно в логах
+  ctx.logger.error(`ERROR: ${error.stack}`.replace(/\n/g, ' '));
+}
+
+/**
  * Send notification to telegram.
  * see: https://core.telegram.org/bots/api#sendmessage
  *
  * @param {Object} ctx
  * @param {Error} error
  */
-async function trySendTelegramNotification(ctx, error) {
+async function sendErrorToTelegram(ctx, error) {
   const { tgNotifyUrl, tgNotifyPrefix } = config;
   if (tgNotifyUrl) {
     ctx.logger.log('NOTIFICATION: sending to telegram.');
-    const text = `${tgNotifyPrefix || ''} ${error.stack || error.message || error}`.trim();
+    const text = `${tgNotifyPrefix || ''} ${error.message} ${ctx.logger.prefix}`.trim();
     const body = JSON.stringify({ text });
     const result = await sendRequest(tgNotifyUrl, {
       method: 'POST',
@@ -273,10 +278,12 @@ async function trySendTelegramNotification(ctx, error) {
  */
 class Logger {
   constructor(ctx) {
-    const prefix = `[ ${ctx.requestId.slice(0, 8)} ]`;
-    this.log = (...args) => console.log(prefix, ...args);
-    this.warn = (...args) => console.warn(prefix, ...args);
-    this.error = (...args) => console.error(prefix, ...args);
+    const shortReqId = ctx.requestId.slice(0, 6);
+    const shortUserId = getUserId(ctx).slice(0, 6);
+    this.prefix = `[${[shortReqId, shortUserId].filter(Boolean).join(', ')}]`;
+    this.log = (...args) => console.log(this.prefix, ...args);
+    this.warn = (...args) => console.warn(this.prefix, ...args);
+    this.error = (...args) => console.error(this.prefix, ...args);
   }
 }
 
@@ -302,35 +309,15 @@ class Timings {
 }
 
 /**
- * Attach user_id to error message.
+ * Returns alice user id.
  *
- * @param {Error} error
- * @param {Object} ctx
- * @returns {Error}
+ * @param {object} ctx
+ * @returns {string}
  */
-function attachUserIdToError(error, ctx) {
+function getUserId(ctx) {
   try {
-    const userId = getShortUserId(ctx);
-    if (userId) {
-      error.message += ` (userId: ${userId})`;
-    }
-    return error;
-  } catch (e) /* istanbul ignore next */ {
-    return error;
-  }
-}
-
-/**
- * Extracts user_id truncated to 6 chars.
- *
- * @param {Object} ctx
- * @returns {String}
- */
-function getShortUserId(ctx) {
-  try {
-    return ctx.reqBody.session.user_id.slice(0, 6);
+    return ctx.reqBody.session.user_id || '';
   } catch (e) {
-    ctx.logger.error(`Can't extract userId from request: ${e.message}`);
     return '';
   }
 }
