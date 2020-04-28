@@ -15,7 +15,7 @@ describe('errors', () => {
 
     assert.deepEqual(response, {
       response: {
-        text: 'Please set targetUrl in config.js [req123, user12]',
+        text: 'Please set targetUrl in config.js [req123-user12]',
         tts: 'Ошибка',
         end_session: false
       },
@@ -90,7 +90,7 @@ describe('errors', () => {
     scope.done();
     assert.deepEqual(response, {
       response: {
-        text: '500 null http://localhost [req123, 123]',
+        text: '500 null http://localhost [req123-123]',
         tts: 'Ошибка',
         end_session: false
       },
@@ -119,7 +119,7 @@ describe('errors', () => {
     scope.done();
     assert.deepEqual(response, {
       response: {
-        text: 'Unexpected end of JSON input [req123, user12]',
+        text: 'Unexpected end of JSON input [req123-user12]',
         tts: 'Ошибка',
         end_session: false
       },
@@ -148,7 +148,7 @@ describe('errors', () => {
     scope.done();
     assert.deepEqual(response, {
       response: {
-        text: 'err message [req123, 123]',
+        text: 'err message [req123-123]',
         tts: 'Ошибка',
         end_session: false
       },
@@ -193,7 +193,7 @@ describe('errors', () => {
 
     const scope = nock('https://api.telegram.org')
       .post('/bot123/sendMessage?chat_id=456',
-          body => body.text.includes('[тест] Please set targetUrl in config.js [req123, user12]')
+          body => body.text.includes('[тест] Please set targetUrl in config.js [req123-user12]')
       )
       .reply(200, { ok: true });
 

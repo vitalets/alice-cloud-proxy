@@ -280,7 +280,7 @@ class Logger {
   constructor(ctx) {
     const shortReqId = ctx.requestId.slice(0, 6);
     const shortUserId = getUserId(ctx).slice(0, 6);
-    this.prefix = `[${[shortReqId, shortUserId].filter(Boolean).join(', ')}]`;
+    this.prefix = `[${[shortReqId, shortUserId].filter(Boolean).join('-')}]`;
     this.log = (...args) => console.log(this.prefix, ...args);
     this.warn = (...args) => console.warn(this.prefix, ...args);
     this.error = (...args) => console.error(this.prefix, ...args);
