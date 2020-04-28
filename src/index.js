@@ -42,8 +42,8 @@ async function handleRequest(ctx) {
     }
     return await proxyRequest(ctx);
   } catch (error) {
-    logError(ctx, error);
-    sendErrorToTelegram(ctx, error).catch(e => ctx.logger.error(e));
+    ctx.logger.error(error.stack);
+    sendErrorToTelegram(ctx, error).catch(e => ctx.logger.error(e.stack));
     return buildErrorResponse(ctx, error);
   }
 }
@@ -239,17 +239,6 @@ function isAllowedUser({ session }) {
 }
 
 /**
- * Log error to console.
- *
- * @param {object} ctx
- * @param {error} error
- */
-function logError(ctx, error) {
-  // убираем \n в ошибке, чтобы выглядело компактно в логах
-  ctx.logger.error(`ERROR: ${error.stack}`.replace(/\n/g, ' '));
-}
-
-/**
  * Send notification to telegram.
  * see: https://core.telegram.org/bots/api#sendmessage
  *
@@ -282,9 +271,14 @@ class Logger {
     const shortReqId = ctx.requestId.slice(0, 6);
     const shortUserId = getUserId(ctx).slice(0, 6);
     this.prefix = `[${[shortReqId, shortUserId].filter(Boolean).join('-')}]`;
-    this.log = (...args) => console.log(this.prefix, ...args);
-    this.warn = (...args) => console.warn(this.prefix, ...args);
-    this.error = (...args) => console.error(this.prefix, ...args);
+    this.log = (...args) => console.log(this.prefix, ...this._format(args));
+    this.warn = (...args) => console.warn(this.prefix, ...this._format(args));
+    this.error = (...args) => console.error(this.prefix, ...this._format(args));
+  }
+
+  // заменяем \n на пробелы, чтобы выглядело компактно в логах функции
+  _format(args) {
+    return args.map(arg => typeof arg === 'string' ? arg.replace(/\n/g, ' ') : arg);
   }
 }
 
