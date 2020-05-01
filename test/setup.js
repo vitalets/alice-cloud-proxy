@@ -19,7 +19,6 @@ beforeEach(() => {
   config.targetUrl = 'http://localhost';
   config.timeout = 250;
   config.errorText = '';
-  config.allowedUsers = [];
   config.tgNotifyUrl = '';
   config.tgNotifyPrefix = '';
 });

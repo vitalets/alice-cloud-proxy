@@ -34,13 +34,9 @@ async function handleRequest(ctx) {
   const { reqBody } = ctx;
   try {
     loadConfig();
-    if (isPing(reqBody)) {
-      return buildPingResponse(reqBody);
-    }
-    if (!isAllowedUser(reqBody)) {
-      return buildNotAllowedResponse(reqBody);
-    }
-    return await proxyRequest(ctx);
+    return isPing(reqBody)
+      ? buildPingResponse(reqBody)
+      : await proxyRequest(ctx);
   } catch (error) {
     ctx.logger.error(error.stack);
     sendErrorToTelegram(ctx, error).catch(e => ctx.logger.error(e.stack));
@@ -208,34 +204,6 @@ function buildErrorResponse(ctx, error) {
     session,
     version,
   };
-}
-
-/**
- * Builds alice response for not allowed user
- *
- * @param {Object} event
- * @returns {Promise}
- */
-function buildNotAllowedResponse({ version, session }) {
-  return {
-    response: {
-      text: 'Это приватный навык. Для выхода скажите "Хватит".',
-      end_session: false,
-    },
-    session,
-    version,
-  };
-}
-
-/**
- * Is allowed user.
- *
- * @param {Object} reqBody
- * @returns {Boolean}
- */
-function isAllowedUser({ session }) {
-  const { allowedUsers } = config;
-  return !allowedUsers || !allowedUsers.length || allowedUsers.includes(session.user_id);
 }
 
 /**
