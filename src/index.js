@@ -268,8 +268,8 @@ async function sendErrorToTelegram(ctx, error) {
  */
 class Logger {
   constructor(ctx) {
-    const shortReqId = ctx.requestId.slice(0, 6);
-    const shortUserId = getUserId(ctx).slice(0, 6);
+    const shortReqId = ctx.requestId.slice(0, 8);
+    const shortUserId = getUserId(ctx).slice(0, 8);
     this.prefix = `[${[shortReqId, shortUserId].filter(Boolean).join('-')}]`;
     this.log = (...args) => console.log(this.prefix, ...this._format(args));
     this.warn = (...args) => console.warn(this.prefix, ...this._format(args));
