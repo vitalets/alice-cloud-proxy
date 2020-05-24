@@ -1,3 +1,5 @@
+// alice-cloud-proxy
+// build: Sun May 24 2020 21:56:39 GMT+0300 (Moscow Standard Time) [0307a09f36f5c52f71550ab6b0d9c013]
 const getHttp = () => require('http');
 const getHttps = () => require('https');
 const getConfig = () => require('./config');

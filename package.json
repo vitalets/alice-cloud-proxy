@@ -13,6 +13,7 @@
   "scripts": {
     "code": "eslint src test",
     "test": "mocha test/setup.js test/specs/**",
+    "bump": "node bump-hash.js",
     "test:cov": "nyc --reporter=html --check-coverage --lines 95 npm t && nyc report",
     "open:cov": "open coverage/index.html"
   },
