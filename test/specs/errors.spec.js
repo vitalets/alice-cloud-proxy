@@ -10,7 +10,7 @@ describe('errors', () => {
       session: {
         user_id: 'user12345678'
       },
-      version: 2,
+      version: '1.0',
     });
 
     assert.deepEqual(response, {
@@ -19,10 +19,7 @@ describe('errors', () => {
         tts: 'Ошибка',
         end_session: false
       },
-      session: {
-        user_id: 'user12345678'
-      },
-      version: 2,
+      version: '1.0',
     });
   });
 
@@ -39,7 +36,7 @@ describe('errors', () => {
       session: {
         user_id: '123'
       },
-      version: 2,
+      version: '1.0',
     });
 
     assert.include(response.text, 'Request timeout: 250 ms');
@@ -85,7 +82,7 @@ describe('errors', () => {
       session: {
         user_id: '123'
       },
-      version: 2,
+      version: '1.0',
     });
 
     scope.done();
@@ -95,10 +92,7 @@ describe('errors', () => {
         tts: 'Ошибка',
         end_session: false
       },
-      session: {
-        user_id: '123'
-      },
-      version: 2,
+      version: '1.0',
     });
   });
 
@@ -114,7 +108,7 @@ describe('errors', () => {
       session: {
         user_id: 'user1234'
       },
-      version: 2,
+      version: '1.0',
     });
 
     scope.done();
@@ -124,10 +118,7 @@ describe('errors', () => {
         tts: 'Ошибка',
         end_session: false
       },
-      session: {
-        user_id: 'user1234'
-      },
-      version: 2,
+      version: '1.0',
     });
   });
 
@@ -143,7 +134,7 @@ describe('errors', () => {
       session: {
         user_id: '123'
       },
-      version: 2,
+      version: '1.0',
     });
 
     scope.done();
@@ -153,10 +144,7 @@ describe('errors', () => {
         tts: 'Ошибка',
         end_session: false
       },
-      session: {
-        user_id: '123'
-      },
-      version: 2,
+      version: '1.0',
     });
   });
 
@@ -171,7 +159,7 @@ describe('errors', () => {
       session: {
         user_id: '123'
       },
-      version: 2,
+      version: '1.0',
     });
 
     assert.deepEqual(response, {
@@ -180,10 +168,7 @@ describe('errors', () => {
         tts: 'Повторите пожалуйста',
         end_session: false
       },
-      session: {
-        user_id: '123'
-      },
-      version: 2,
+      version: '1.0',
     });
   });
 
@@ -205,7 +190,7 @@ describe('errors', () => {
       session: {
         user_id: 'user1234'
       },
-      version: 2,
+      version: '1.0',
     });
 
     scope.done();
@@ -222,7 +207,7 @@ describe('errors', () => {
         // no user_id field
         // user_id: '123'
       },
-      version: 2,
+      version: '1.0',
     });
 
     assert.deepEqual(response, {
@@ -231,10 +216,7 @@ describe('errors', () => {
         tts: 'Ошибка',
         end_session: false
       },
-      session: {
-
-      },
-      version: 2,
+      version: '1.0',
     });
   });
 

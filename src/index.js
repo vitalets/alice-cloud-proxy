@@ -35,7 +35,7 @@ async function handleRequest(ctx) {
   try {
     loadConfig();
     return isPing(reqBody)
-      ? buildPingResponse(reqBody)
+      ? buildPingResponse()
       : await proxyRequest(ctx);
   } catch (error) {
     ctx.logger.error(error.stack);
@@ -170,17 +170,15 @@ async function sendRequest(url, options, body) {
 /**
  * Builds alice response for 'ping'
  *
- * @param {Object} event
  * @returns {Promise}
  */
-function buildPingResponse({ session, version }) {
+function buildPingResponse() {
   return {
     response: {
       text: 'pong',
       end_session: false,
     },
-    session,
-    version,
+    version: '1.0',
   };
 }
 
@@ -192,7 +190,6 @@ function buildPingResponse({ session, version }) {
  * @returns {Object}
  */
 function buildErrorResponse(ctx, error) {
-  const { version, session } = ctx.reqBody;
   const text = (config && config.errorText) || `${error.message} ${ctx.logger.prefix}`;
   const tts = (config && config.errorText) || 'Ошибка';
   return {
@@ -201,8 +198,7 @@ function buildErrorResponse(ctx, error) {
       tts,
       end_session: false,
     },
-    session,
-    version,
+    version: '1.0',
   };
 }
 

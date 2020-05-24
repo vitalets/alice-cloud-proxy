@@ -9,8 +9,10 @@ describe('ping', () => {
       request: {
         command: 'ping'
       },
-      session: 1,
-      version: 2,
+      session: {
+        user_id: 'user12345678'
+      },
+      version: '1.0',
     });
 
     assert.equal(scope.isDone(), false);
@@ -19,8 +21,7 @@ describe('ping', () => {
         text: 'pong',
         end_session: false
       },
-      session: 1,
-      version: 2,
+      version: '1.0',
     });
   });
 

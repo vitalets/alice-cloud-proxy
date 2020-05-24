@@ -55,7 +55,7 @@ describe('proxy success', () => {
       session: {
         user_id: 'user12345678'
       },
-      version: 2,
+      version: '1.0',
     });
 
     scope.done();
